@@ -16,14 +16,15 @@ subscription.
 [![License: MIT](https://img.shields.io/badge/license-MIT-0e4243)](LICENSE)
 [![Price: free](https://img.shields.io/badge/price-free-6b998c)](#faq)
 
-[Why Fenn](#why-fenn) · [Features](#features) · [How Fenn works](#how-fenn-works) · [Build and run](#build-and-run) ·
+[Why Fenn](#why-fenn) · [Features](#features) · [How Fenn works](#how-fenn-works) · [Install](#install) ·
 [Models](docs/MODELS.md) · [FAQ](#faq)
 
 </div>
 
 > **Deutsch:** Fenn Focus ist ein kostenloser, ruhiger Assistent in der Notch deines Macs: Aufgaben, Kalender,
 > Routinen, Notizen und Fokusblöcke, dazu Fenn, ein Kiesel, der deinen Tag mit dir plant. Die KI läuft lokal auf deinem
-> Mac oder mit deinem eigenen Schlüssel. Die App spricht Deutsch und Englisch.
+> Mac oder mit deinem eigenen Schlüssel. Die App spricht Deutsch und Englisch. Entwickelt mit KI-Programmierwerkzeugen,
+> ohne Gewähr – siehe [Haftungsausschluss](#disclaimer).
 
 ## Why Fenn
 
@@ -35,12 +36,8 @@ day, plans it with me and then gets out of the way.
 So I built it for myself. Fenn sits in the notch and shows the next meeting, the running focus block and what matters
 today. When I say *"remind me about the offer tomorrow and start 25 minutes on the pitch deck"*, it just does it.
 
-Then the bigger idea: everyone in a company with too many tasks should be able to have their own Fenn, for free. No
-licence per seat, no account, no server someone has to approve. It runs on the Mac you already have, keeps your data
-in a folder you choose, and by default the AI never leaves the device. That's why Fenn Focus is open source under MIT.
-
-**Fenn is your unobtrusive assistant:** quiet in the notch until you need it, then it plans, reminds and starts
-things for you.
+Everyone at work with too many tasks should be able to have a Fenn: free, no account, nothing for IT to approve.
+It runs on your Mac, keeps your data in your own folder, and the AI stays on the device. That's why it's open source.
 
 ## Features
 
@@ -107,29 +104,27 @@ claude mcp add --transport http fenn http://127.0.0.1:<port>/mcp --header "Autho
 
 Your coding agent then sees the same tools Fenn uses: tasks, day schedule, focus, routines and more.
 
-## Requirements
+## Install
 
-- macOS 14 or later; Apple Silicon for built-in models (MLX). Apple's on-device model needs macOS 26.
-- Xcode with the macOS 26 SDK to build.
+Fenn Focus needs macOS 14 or later on a Mac with Apple Silicon (M1 or newer).
 
-## Build and run
+**Download (easiest)**
 
-```bash
-git clone https://github.com/koernertom/fenn-focus.git
-cd fenn-focus
-python3 Scripts/generate_xcodeproj.py
-open FennFocus.xcodeproj   # run the FennFocus scheme
-```
+1. Download `FennFocus.zip` from [Releases](https://github.com/koernertom/fenn-focus/releases/latest), open it and drag
+   **FennFocus** into your Applications folder.
+2. Open it. The first time, macOS says it can't check the app, because it isn't notarised by Apple. Go to
+   **System Settings › Privacy & Security** and click **Open Anyway**. You only do this once.
+3. Fenn appears in the notch and asks you a few questions. That's it.
 
-Without an Apple developer account the app is signed to run locally. Desktop widgets need a real signing team: copy
-`Config/Local.xcconfig.example` to `Config/Local.xcconfig` and set your team id (that file is ignored by git).
-
-Command line:
+**Build it yourself** (needs [Xcode](https://apps.apple.com/app/xcode/id497799835), one command)
 
 ```bash
-xcodebuild -project FennFocus.xcodeproj -scheme FennFocus -configuration Debug \
-  -derivedDataPath build/DerivedData -skipMacroValidation -skipPackagePluginValidation build
+git clone https://github.com/koernertom/fenn-focus.git && cd fenn-focus && ./Scripts/install.sh
 ```
+
+The script builds Fenn Focus, puts it into Applications and opens it. Developers can open the project in Xcode with
+`python3 Scripts/generate_xcodeproj.py && open FennFocus.xcodeproj`; desktop widgets need your own signing team in
+`Config/Local.xcconfig` (see `Config/Local.xcconfig.example`).
 
 ## Where your data lives
 
@@ -183,6 +178,12 @@ docs                      model guide, diagrams
 
 Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Please keep it local-first and
 key-free.
+
+## Disclaimer
+
+Fenn Focus was written with the help of AI coding tools and reviewed by a person, but it has not been audited. It comes
+as is, without any warranty: I accept no liability for security issues, data loss or any other damage from using it.
+Keep a backup of your Fenn Focus folder, and read the code before you trust it with sensitive data.
 
 ## License
 

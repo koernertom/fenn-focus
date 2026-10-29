@@ -1,0 +1,37 @@
+name: Release
+
+# Push a tag like v1.0.0 and this builds FennFocus.zip and attaches it to a GitHub release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate the Xcode project
+        run: python3 Scripts/generate_xcodeproj.py
+
+      # Signed to run locally (no developer account) – people open it once via Privacy & Security › Open Anyway.
+      - name: Build
+        run: |
+          xcodebuild \
+            -project FennFocus.xcodeproj \
+            -scheme FennFocus \
+            -configuration Release \
+            -derivedDataPath build/Release \
+            -skipMacroValidation -skipPackagePluginValidation \
+            build
+
+      - name: Zip
+        run: ditto -c -k --keepParent build/Release/Build/Products/Release/FennFocus.app FennFocus.zip
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" FennFocus.zip --title "Fenn Focus $GITHUB_REF_NAME" --generate-notes

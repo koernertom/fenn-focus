@@ -695,7 +695,6 @@ for cfg_id, cfg_name in ((HOST_DEBUG, "Debug"), (HOST_RELEASE, "Release")):
     w("\t\t\t\tCODE_SIGN_ENTITLEMENTS = Support/FennFocus.entitlements;")
     w("\t\t\t\tCOMBINE_HIDPI_IMAGES = YES;")
     w("\t\t\t\tCURRENT_PROJECT_VERSION = 1;")
-    w("\t\t\t\tENABLE_HARDENED_RUNTIME = YES;")
     w("\t\t\t\tGENERATE_INFOPLIST_FILE = NO;")
     w("\t\t\t\tINFOPLIST_FILE = \"Support/Host-Info.plist\";")
     w("\t\t\t\tLD_RUNPATH_SEARCH_PATHS = (")

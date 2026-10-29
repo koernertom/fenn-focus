@@ -7,5 +7,8 @@ CODE_SIGN_IDENTITY = Apple Development
 // CODE_SIGN_IDENTITY = 0123456789ABCDEF0123456789ABCDEF01234567
 DEVELOPMENT_TEAM = ABCDE12345
 
+// With your own team the hardened runtime works (and is required to notarise a Developer ID build).
+ENABLE_HARDENED_RUNTIME = YES
+
 // Optional: your own bundle ids if you publish a fork.
 // FENN_BUNDLE_PREFIX = com.example.fennfocus

@@ -6,6 +6,10 @@ CODE_SIGN_STYLE = Automatic
 CODE_SIGN_IDENTITY = -
 DEVELOPMENT_TEAM =
 
+// The hardened runtime only lets the app load code from the same team – with "Sign to Run Locally" every file counts
+// as its own, so the app wouldn't start. It is only needed for Apple's notarisation; switch it on in Local.xcconfig.
+ENABLE_HARDENED_RUNTIME = NO
+
 // Bundle ids: the app, .widgets and .core. Change in Local.xcconfig if you ship a fork.
 FENN_BUNDLE_PREFIX = app.fennfocus
 
