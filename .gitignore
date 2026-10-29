@@ -1,0 +1,16 @@
+# Build output
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcuserdatad/
+
+# Your signing team – copy Config/Local.xcconfig.example to Config/Local.xcconfig
+Config/Local.xcconfig
+
+# Local model weights are downloaded at runtime, never committed
+Models/
+*.safetensors
+*.gguf
+
+.DS_Store

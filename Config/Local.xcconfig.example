@@ -1,0 +1,11 @@
+// Copy to Config/Local.xcconfig (ignored by git) and set your own team.
+// Find your team id in Xcode › Settings › Accounts, or on developer.apple.com › Membership.
+
+CODE_SIGN_IDENTITY = Apple Development
+// Or pin one certificate (its SHA-1 from `security find-identity -v -p codesigning`) with manual signing:
+// CODE_SIGN_STYLE = Manual
+// CODE_SIGN_IDENTITY = 0123456789ABCDEF0123456789ABCDEF01234567
+DEVELOPMENT_TEAM = ABCDE12345
+
+// Optional: your own bundle ids if you publish a fork.
+// FENN_BUNDLE_PREFIX = com.example.fennfocus

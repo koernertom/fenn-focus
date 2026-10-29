@@ -1,0 +1,27 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    # Needs an Xcode with the macOS 26 SDK (Foundation Models). Bump the runner when GitHub ships a newer image.
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate the Xcode project
+        run: python3 Scripts/generate_xcodeproj.py
+
+      - name: Build (unsigned)
+        run: |
+          xcodebuild \
+            -project FennFocus.xcodeproj \
+            -scheme FennFocus \
+            -configuration Debug \
+            -derivedDataPath build/DerivedData \
+            -skipMacroValidation -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            build

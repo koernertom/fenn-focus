@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "page-progress-summer.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

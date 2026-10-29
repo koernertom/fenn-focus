@@ -1,0 +1,15 @@
+// Shared build settings for every target. Signing defaults to "Sign to Run Locally", so the app builds on any Mac
+// without an Apple developer account. To sign with your own team (needed for desktop widgets on some macOS versions),
+// copy Local.xcconfig.example to Local.xcconfig and fill it in – that file is ignored by git.
+
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY = -
+DEVELOPMENT_TEAM =
+
+// Bundle ids: the app, .widgets and .core. Change in Local.xcconfig if you ship a fork.
+FENN_BUNDLE_PREFIX = app.fennfocus
+
+// App Group shared by the app and the widget extension. On macOS it is prefixed with the team id.
+FENN_APP_GROUP = $(TeamIdentifierPrefix)$(FENN_BUNDLE_PREFIX)
+
+#include? "Local.xcconfig"

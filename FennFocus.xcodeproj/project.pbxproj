@@ -1,0 +1,975 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		ABA22A1F8000AAD9BD8933D1 /* FennWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEE0AD319C6AC06B4512ECF /* FennWidgetSnapshot.swift */; };
+		599BCCBA893393825D675FE4 /* KZToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76AC5F6A4E489D7D2F5431B4 /* KZToken.swift */; };
+		03DAD6FEBF417ED7049DC72E /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4605D5BA2FC3B3C60241EB1F /* L10n.swift */; };
+		BA6EB872B259D8FC0E00A86B /* MacWidgetCoreBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF13F5C7E584BF715A7D3E82 /* MacWidgetCoreBundle.swift */; };
+		935589EB3AEC63CC5F7B24B8 /* RhythmCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09B2C0B61F1B87F1496AE556 /* RhythmCore.swift */; };
+		4E18B899ECE01D092783743D /* WidgetReload.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB40B8A2FEB6C8934114261E /* WidgetReload.swift */; };
+		F62BAF8168ABE8180131D272 /* AIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B02EEAB76F5F290A7F26FDE /* AIClient.swift */; };
+		C20892E3FE9EE3552FB6A56F /* AgendaViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2711E824B6101B98E6BAC50 /* AgendaViews.swift */; };
+		B737ACCF779DF0A9A089A216 /* CalendarBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFFEF66A152B437DAD53FE58 /* CalendarBridge.swift */; };
+		6868D79CA7ADCA27C368F339 /* Celebration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12B1EC1BACCF52F2A072CB57 /* Celebration.swift */; };
+		676CA636502C4114E8155736 /* ClayArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08CF8A4B91591EDE5A8E5035 /* ClayArt.swift */; };
+		D908ECD4225EFFC10FFA8436 /* CoachMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2E6E81533108B49987DA2ED /* CoachMessage.swift */; };
+		252E4D93E938FBB34EDB4A31 /* CoachModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 424534F8F8BFB0E54D41DB5D /* CoachModuleView.swift */; };
+		24EB820767F2AEDCA442928E /* CoachViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C292E8857293D1E26DC01B /* CoachViewModel.swift */; };
+		546D5EF54B8A5F0A0FB221C9 /* ConnectorsModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8039939086F768FED71581FC /* ConnectorsModuleView.swift */; };
+		E5AE2FA3A29324CB538B0C35 /* DesktopWidgetGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8E54C354C71A02EE44C999 /* DesktopWidgetGallery.swift */; };
+		A1AAABEAB21D1141F7D8DDCA /* DictationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3D4D5AB4B962E643C9C66A5 /* DictationController.swift */; };
+		F69DFB522A103301C7371C0D /* FennAI.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15532AD5C9EA1E4D1045EA6 /* FennAI.swift */; };
+		BCDDEA33D58931982E8A6B62 /* FennAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2182BFE3108D73953BE1618 /* FennAgent.swift */; };
+		603A04809786DF1F4E8E05F4 /* FennCalendarCleanup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DE05BCBF89BA2F89551A6A /* FennCalendarCleanup.swift */; };
+		0AB1A7C893D7D36174EDE4A7 /* FennDayPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01EB54CC67AAE6ADB20E4FD9 /* FennDayPlanner.swift */; };
+		EDF1DFC2DB9DB7A693272478 /* FennDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A233A689B72EE953679D3F1F /* FennDayView.swift */; };
+		E726FFB014872C4A36809CF9 /* FennDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574C55E6A24808A5CAC5D799 /* FennDemo.swift */; };
+		CDE4BAC3413E72B32D68AE0B /* FennDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C6C01322BC252B2307404B /* FennDesign.swift */; };
+		4B9940E5D84916A7367A2D24 /* FennFocusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD4C53A4CC12E9622FE46262 /* FennFocusApp.swift */; };
+		DB7503CDE93CAFADF6E1D084 /* FennFocusDial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45CBC98B8BEA415354AA76A1 /* FennFocusDial.swift */; };
+		6A0CD059B89108734C9B8EA1 /* FennHabits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A4094350B4F23F2126E132 /* FennHabits.swift */; };
+		E235A9DBAB0E6283259FDFB1 /* FennIdeas.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED30E055D7EF61BF1F3821D9 /* FennIdeas.swift */; };
+		C75166D65F43C8A22192817C /* FennJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9E68021821777B7A43F4E1 /* FennJournal.swift */; };
+		19D17825B22AEE335898B84D /* FennMCPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642C4A66804AA5D1A26E3E2 /* FennMCPServer.swift */; };
+		BB2D8D11E5B6440D3EE08FDD /* FennMarkdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E05F52D16333A2C632DD7E3 /* FennMarkdown.swift */; };
+		D3996B64595CC5C9EAD697D1 /* FennNotificationBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3C430D9E54A5738E16BC2F /* FennNotificationBrand.swift */; };
+		87ACD9B6539FED1E86602A59 /* FennPeek.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC2E97B35EC9E63CD7A016A /* FennPeek.swift */; };
+		4A93FD2E81149F05FC51D074 /* FennQuotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFB7FDE32E6DAD6FE59323A /* FennQuotes.swift */; };
+		3EB13501C1D5861AC5B5F498 /* FennResurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E70112EBB2009FD8DACF49C /* FennResurface.swift */; };
+		BCA08E538F4B9F2A34C53434 /* FennStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693D840F09B306EB4CDFBE13 /* FennStyle.swift */; };
+		38BB4432C2812A2CB5934032 /* FennTaskCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A22AEC88FEC933363551145 /* FennTaskCalendar.swift */; };
+		E5251D945BDCD19AB37DBF94 /* FennTasks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692488FC3ED45B6680AEE1BD /* FennTasks.swift */; };
+		7BBC9539CD5804203C5B471A /* FennThinkingOrb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08EB0E6FFB66E4D9F4CBF62C /* FennThinkingOrb.swift */; };
+		4E52AA879B7EA3C8B7CAF55C /* FennVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEFCC70AA412012B9CD0A0E7 /* FennVault.swift */; };
+		5F3D53A56B3BA5B9C3284B9D /* FennVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BBA955152E3328680889E4B /* FennVoice.swift */; };
+		3E36CEB094F1467E19E0BDB5 /* FennWidgetBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC50BB569B5B22D3BFA1A98 /* FennWidgetBridge.swift */; };
+		07BFC9A0F2BD0BD2E4BB3072 /* FocusModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0AA127E0CA36EB4C969CE57 /* FocusModuleView.swift */; };
+		A2AC77C82B92C2CFB7052980 /* FocusMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4748A78FC27779E0B1443E5 /* FocusMusic.swift */; };
+		75CAF200ECD58245A6D87055 /* FocusTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4CDF2B1103C13E70445AD8 /* FocusTimer.swift */; };
+		15BB0E46FBC0AC844B4B79B4 /* HabitsModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811D4D5E03455F4B02FD790E /* HabitsModuleView.swift */; };
+		878E8FA6091297AC87DD2C46 /* HomeLayoutMac.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC9832A2690C8796C15EFE9 /* HomeLayoutMac.swift */; };
+		6149052D5C2A9637082F5D94 /* HotKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = F622A99B9DA312C02410698E /* HotKey.swift */; };
+		4D18FAD4DF95F0B147F1EB1F /* IdeasModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD0E4CD0355F5178A0F9B5D9 /* IdeasModuleView.swift */; };
+		FE0C71213DFB6661E08FFD1A /* IslandController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1430B108C7EF092D0A20F232 /* IslandController.swift */; };
+		8A33A9DF738312DA8BC288D1 /* IslandModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F920515420EFD6E5A77758C0 /* IslandModel.swift */; };
+		44BEC0F98102E50AAF07F736 /* IslandRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA08ED62F2F0B0040F67FCD5 /* IslandRootView.swift */; };
+		79933CDE380F31EBE5CC31A1 /* JournalModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C73E3F6787D03A47317402 /* JournalModuleView.swift */; };
+		FB40A9886772329DD53580DD /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7778DD5772546EA5D3181643 /* KeychainStore.swift */; };
+		34C9EEBD15DB30532CA36114 /* KnowledgeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 226C11C3A0BE1C2426CFCBC1 /* KnowledgeStore.swift */; };
+		E39A2CBF5336F0E2ABD2F81D /* LocalBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5648CE4EE305B70AEA438100 /* LocalBrain.swift */; };
+		6AA5BF3E2D7E727CFB4D000B /* LocalIntelligence.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F1D77AA9D6BBA51B5ED8C7 /* LocalIntelligence.swift */; };
+		E992D03319B6A342DC11AA59 /* LocalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6FDA1BF0F888EEBD9B685B8 /* LocalModels.swift */; };
+		366B26E86D19FB7190015F6D /* LocalVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81777ECFA3A532CB704872C0 /* LocalVoice.swift */; };
+		C9A178BB67E43021AD2FD8BF /* MacAgentTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E368887D0BDFDD98D89C64F /* MacAgentTools.swift */; };
+		8DA5D81C917A905BAFAC3B5B /* MacBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A4852E012265B99A089D0B /* MacBlocker.swift */; };
+		E7700DE69B834E8A021A2492 /* MacDesignSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4896977513B4D4F1FD198103 /* MacDesignSheet.swift */; };
+		1D23FD3625A809639B52E805 /* MacMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9199F99438103867E13C9DA2 /* MacMode.swift */; };
+		AA806879404BB001A9F65681 /* MacOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BD8BA98E6BBD64073774262 /* MacOnboardingView.swift */; };
+		655F2FB43A2B2BA320488006 /* MetricsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B44B9ED4DAE0F78B579FCF /* MetricsStore.swift */; };
+		F3D1D59C9186D24A89112AC9 /* NotchNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08F92F74A377A525E0B8C83A /* NotchNotice.swift */; };
+		DC14580AF98B607422CF89FD /* NotesModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E159FC5300A48E35F4120734 /* NotesModuleView.swift */; };
+		7F9CBEFD3217A8E0E6AE8E8F /* NotesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900B7F56FF345127B7AADAF6 /* NotesStore.swift */; };
+		0D09A99B940DC1EF7A52A19E /* PebbleFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366FA6888F34C2A6567E10E9 /* PebbleFace.swift */; };
+		9C395A6A8788A98321760E3E /* PersonProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60A61A4CA8C47F93BEB1011 /* PersonProfile.swift */; };
+		EDA00CC27DF54A08B3528AFB /* SyncFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040EFF9ADB1236D8E4A9F942 /* SyncFolder.swift */; };
+		599D5F8EF0AA59351D853BD3 /* TasksModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B4F341A54005641FCC8723 /* TasksModuleView.swift */; };
+		496E587C90CD4338D68DD907 /* TodayModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D3FEA597DA7F0E971CE0E3 /* TodayModuleView.swift */; };
+		3D8BFBCC7CBE0BD5BA17997F /* Transcriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F017ACFDB98CE4F0655FE415 /* Transcriber.swift */; };
+		2511380DBF3BBC49ED44B036 /* WorkCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15CF7BEF04B98003613F8FB /* WorkCalendar.swift */; };
+		815C6CC332C81FE2E79240DB /* DesktopClayViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF994210E3DA98253F0D76E1 /* DesktopClayViews.swift */; };
+		692AC10526E8AEFDE093F9DE /* FennDesktopWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA13ED7D037FBB26F3962A9E /* FennDesktopWidgets.swift */; };
+		6436F8C3DEA67882684B693F /* WidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7DE30C35F6BDE953DEDD71 /* WidgetBundle.swift */; };
+		1E099A1EB41A66B7F33315FF /* DesktopClayViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF994210E3DA98253F0D76E1 /* DesktopClayViews.swift */; };
+		956A1D3FAA7AC13D5A48A56F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7DF34072C17E0610D68D580A /* Assets.xcassets */; };
+		E4327E3E0A70B82DA859FC87 /* WidgetAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B101DA7B1B6CC6550F5DCDD /* WidgetAssets.xcassets */; };
+		FE7A0D4815B69C6E04B873A4 /* FennFocusCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A280702D9141FFEEB42343D /* FennFocusCore.framework */; };
+		062D138A36674ADC90E11B7C /* FennFocusCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A280702D9141FFEEB42343D /* FennFocusCore.framework */; };
+		EFC17EF7A5155118FCB8D8D0 /* FennFocusCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4A280702D9141FFEEB42343D /* FennFocusCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		421F90E0157062B178B5C4CA /* FennFocusWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2DC9BDE68C1E20F69D48C26F /* FennFocusWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		33134EA429D71D997846E4FD /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CD1E9D80FD64FF214F402B8 /* WidgetKit.framework */; };
+		2A88CB12E547ED68D14F8769 /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = F9D61D5D9C07E32154B46BD2 /* MLXLLM */; };
+		117ED7BFF9BA245B7B860A6E /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 06F96FF1B896D22EDB554C4D /* MLXLMCommon */; };
+		617D613F904D6651F645D240 /* Tokenizers in Frameworks */ = {isa = PBXBuildFile; productRef = A9D5921B4AA4249BAD75C0BC /* Tokenizers */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7A1FDB5820696575350FF424 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7540368EB4A5251EC8D4EAA0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C67716B728D59B0ACD3927A1;
+			remoteInfo = FennFocusCore;
+		};
+		DA9B38DE5C278F707F61D7F1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7540368EB4A5251EC8D4EAA0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A9D7DCA0FD010F266B20FA03;
+			remoteInfo = FennFocusWidgets;
+		};
+		41D3EABD07ACBB97177C62DB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7540368EB4A5251EC8D4EAA0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C67716B728D59B0ACD3927A1;
+			remoteInfo = FennFocusCore;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		42DE3841264F1BFCD360306A /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				EFC17EF7A5155118FCB8D8D0 /* FennFocusCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		13EB25F09D768013A34E08CC /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				421F90E0157062B178B5C4CA /* FennFocusWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		4A280702D9141FFEEB42343D /* FennFocusCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FennFocusCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9BB23C9DB1801D2DEDDFB61 /* FennFocus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FennFocus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DC9BDE68C1E20F69D48C26F /* FennFocusWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FennFocusWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		1BEE0AD319C6AC06B4512ECF /* FennWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennWidgetSnapshot.swift"; sourceTree = "<group>"; };
+		76AC5F6A4E489D7D2F5431B4 /* KZToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KZToken.swift"; sourceTree = "<group>"; };
+		4605D5BA2FC3B3C60241EB1F /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "L10n.swift"; sourceTree = "<group>"; };
+		AF13F5C7E584BF715A7D3E82 /* MacWidgetCoreBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MacWidgetCoreBundle.swift"; sourceTree = "<group>"; };
+		09B2C0B61F1B87F1496AE556 /* RhythmCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RhythmCore.swift"; sourceTree = "<group>"; };
+		FB40B8A2FEB6C8934114261E /* WidgetReload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WidgetReload.swift"; sourceTree = "<group>"; };
+		7B02EEAB76F5F290A7F26FDE /* AIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIClient.swift"; sourceTree = "<group>"; };
+		D2711E824B6101B98E6BAC50 /* AgendaViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgendaViews.swift"; sourceTree = "<group>"; };
+		EFFEF66A152B437DAD53FE58 /* CalendarBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CalendarBridge.swift"; sourceTree = "<group>"; };
+		12B1EC1BACCF52F2A072CB57 /* Celebration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Celebration.swift"; sourceTree = "<group>"; };
+		08CF8A4B91591EDE5A8E5035 /* ClayArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ClayArt.swift"; sourceTree = "<group>"; };
+		E2E6E81533108B49987DA2ED /* CoachMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoachMessage.swift"; sourceTree = "<group>"; };
+		424534F8F8BFB0E54D41DB5D /* CoachModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoachModuleView.swift"; sourceTree = "<group>"; };
+		72C292E8857293D1E26DC01B /* CoachViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoachViewModel.swift"; sourceTree = "<group>"; };
+		8039939086F768FED71581FC /* ConnectorsModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConnectorsModuleView.swift"; sourceTree = "<group>"; };
+		0D8E54C354C71A02EE44C999 /* DesktopWidgetGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DesktopWidgetGallery.swift"; sourceTree = "<group>"; };
+		E3D4D5AB4B962E643C9C66A5 /* DictationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DictationController.swift"; sourceTree = "<group>"; };
+		D15532AD5C9EA1E4D1045EA6 /* FennAI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennAI.swift"; sourceTree = "<group>"; };
+		B2182BFE3108D73953BE1618 /* FennAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennAgent.swift"; sourceTree = "<group>"; };
+		30DE05BCBF89BA2F89551A6A /* FennCalendarCleanup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennCalendarCleanup.swift"; sourceTree = "<group>"; };
+		01EB54CC67AAE6ADB20E4FD9 /* FennDayPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennDayPlanner.swift"; sourceTree = "<group>"; };
+		A233A689B72EE953679D3F1F /* FennDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennDayView.swift"; sourceTree = "<group>"; };
+		574C55E6A24808A5CAC5D799 /* FennDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennDemo.swift"; sourceTree = "<group>"; };
+		F2C6C01322BC252B2307404B /* FennDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennDesign.swift"; sourceTree = "<group>"; };
+		DD4C53A4CC12E9622FE46262 /* FennFocusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennFocusApp.swift"; sourceTree = "<group>"; };
+		45CBC98B8BEA415354AA76A1 /* FennFocusDial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennFocusDial.swift"; sourceTree = "<group>"; };
+		28A4094350B4F23F2126E132 /* FennHabits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennHabits.swift"; sourceTree = "<group>"; };
+		ED30E055D7EF61BF1F3821D9 /* FennIdeas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennIdeas.swift"; sourceTree = "<group>"; };
+		2B9E68021821777B7A43F4E1 /* FennJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennJournal.swift"; sourceTree = "<group>"; };
+		2642C4A66804AA5D1A26E3E2 /* FennMCPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennMCPServer.swift"; sourceTree = "<group>"; };
+		7E05F52D16333A2C632DD7E3 /* FennMarkdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennMarkdown.swift"; sourceTree = "<group>"; };
+		7E3C430D9E54A5738E16BC2F /* FennNotificationBrand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennNotificationBrand.swift"; sourceTree = "<group>"; };
+		3DC2E97B35EC9E63CD7A016A /* FennPeek.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennPeek.swift"; sourceTree = "<group>"; };
+		8FFB7FDE32E6DAD6FE59323A /* FennQuotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennQuotes.swift"; sourceTree = "<group>"; };
+		7E70112EBB2009FD8DACF49C /* FennResurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennResurface.swift"; sourceTree = "<group>"; };
+		693D840F09B306EB4CDFBE13 /* FennStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennStyle.swift"; sourceTree = "<group>"; };
+		0A22AEC88FEC933363551145 /* FennTaskCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennTaskCalendar.swift"; sourceTree = "<group>"; };
+		692488FC3ED45B6680AEE1BD /* FennTasks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennTasks.swift"; sourceTree = "<group>"; };
+		08EB0E6FFB66E4D9F4CBF62C /* FennThinkingOrb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennThinkingOrb.swift"; sourceTree = "<group>"; };
+		FEFCC70AA412012B9CD0A0E7 /* FennVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennVault.swift"; sourceTree = "<group>"; };
+		8BBA955152E3328680889E4B /* FennVoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennVoice.swift"; sourceTree = "<group>"; };
+		8BC50BB569B5B22D3BFA1A98 /* FennWidgetBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennWidgetBridge.swift"; sourceTree = "<group>"; };
+		C0AA127E0CA36EB4C969CE57 /* FocusModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FocusModuleView.swift"; sourceTree = "<group>"; };
+		F4748A78FC27779E0B1443E5 /* FocusMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FocusMusic.swift"; sourceTree = "<group>"; };
+		DF4CDF2B1103C13E70445AD8 /* FocusTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FocusTimer.swift"; sourceTree = "<group>"; };
+		811D4D5E03455F4B02FD790E /* HabitsModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HabitsModuleView.swift"; sourceTree = "<group>"; };
+		BAC9832A2690C8796C15EFE9 /* HomeLayoutMac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeLayoutMac.swift"; sourceTree = "<group>"; };
+		F622A99B9DA312C02410698E /* HotKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HotKey.swift"; sourceTree = "<group>"; };
+		BD0E4CD0355F5178A0F9B5D9 /* IdeasModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IdeasModuleView.swift"; sourceTree = "<group>"; };
+		1430B108C7EF092D0A20F232 /* IslandController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IslandController.swift"; sourceTree = "<group>"; };
+		F920515420EFD6E5A77758C0 /* IslandModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IslandModel.swift"; sourceTree = "<group>"; };
+		EA08ED62F2F0B0040F67FCD5 /* IslandRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IslandRootView.swift"; sourceTree = "<group>"; };
+		A4C73E3F6787D03A47317402 /* JournalModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JournalModuleView.swift"; sourceTree = "<group>"; };
+		7778DD5772546EA5D3181643 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainStore.swift"; sourceTree = "<group>"; };
+		226C11C3A0BE1C2426CFCBC1 /* KnowledgeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KnowledgeStore.swift"; sourceTree = "<group>"; };
+		5648CE4EE305B70AEA438100 /* LocalBrain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalBrain.swift"; sourceTree = "<group>"; };
+		F1F1D77AA9D6BBA51B5ED8C7 /* LocalIntelligence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalIntelligence.swift"; sourceTree = "<group>"; };
+		A6FDA1BF0F888EEBD9B685B8 /* LocalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalModels.swift"; sourceTree = "<group>"; };
+		81777ECFA3A532CB704872C0 /* LocalVoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalVoice.swift"; sourceTree = "<group>"; };
+		5E368887D0BDFDD98D89C64F /* MacAgentTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MacAgentTools.swift"; sourceTree = "<group>"; };
+		86A4852E012265B99A089D0B /* MacBlocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MacBlocker.swift"; sourceTree = "<group>"; };
+		4896977513B4D4F1FD198103 /* MacDesignSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MacDesignSheet.swift"; sourceTree = "<group>"; };
+		9199F99438103867E13C9DA2 /* MacMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MacMode.swift"; sourceTree = "<group>"; };
+		1BD8BA98E6BBD64073774262 /* MacOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MacOnboardingView.swift"; sourceTree = "<group>"; };
+		07B44B9ED4DAE0F78B579FCF /* MetricsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MetricsStore.swift"; sourceTree = "<group>"; };
+		08F92F74A377A525E0B8C83A /* NotchNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotchNotice.swift"; sourceTree = "<group>"; };
+		E159FC5300A48E35F4120734 /* NotesModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotesModuleView.swift"; sourceTree = "<group>"; };
+		900B7F56FF345127B7AADAF6 /* NotesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotesStore.swift"; sourceTree = "<group>"; };
+		366FA6888F34C2A6567E10E9 /* PebbleFace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PebbleFace.swift"; sourceTree = "<group>"; };
+		C60A61A4CA8C47F93BEB1011 /* PersonProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersonProfile.swift"; sourceTree = "<group>"; };
+		040EFF9ADB1236D8E4A9F942 /* SyncFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncFolder.swift"; sourceTree = "<group>"; };
+		00B4F341A54005641FCC8723 /* TasksModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TasksModuleView.swift"; sourceTree = "<group>"; };
+		80D3FEA597DA7F0E971CE0E3 /* TodayModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodayModuleView.swift"; sourceTree = "<group>"; };
+		F017ACFDB98CE4F0655FE415 /* Transcriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transcriber.swift"; sourceTree = "<group>"; };
+		F15CF7BEF04B98003613F8FB /* WorkCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WorkCalendar.swift"; sourceTree = "<group>"; };
+		CF994210E3DA98253F0D76E1 /* DesktopClayViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DesktopClayViews.swift"; sourceTree = "<group>"; };
+		CA13ED7D037FBB26F3962A9E /* FennDesktopWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FennDesktopWidgets.swift"; sourceTree = "<group>"; };
+		FC7DE30C35F6BDE953DEDD71 /* WidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WidgetBundle.swift"; sourceTree = "<group>"; };
+		57CA8F4ACB404E369C2D7515 /* FennFocus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FennFocus.entitlements; sourceTree = "<group>"; };
+		AD30600B0C3D543669E699E5 /* FennFocusWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FennFocusWidgets.entitlements; sourceTree = "<group>"; };
+		B9EE24F9745EDB309FF321F2 /* Host-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Host-Info.plist"; sourceTree = "<group>"; };
+		52E1E85081F8FCA2304BBC2E /* WidgetExtension-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "WidgetExtension-Info.plist"; sourceTree = "<group>"; };
+		7DF34072C17E0610D68D580A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5B101DA7B1B6CC6550F5DCDD /* WidgetAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = WidgetAssets.xcassets; sourceTree = "<group>"; };
+		9CD1E9D80FD64FF214F402B8 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		FC25E46B4A09EC2484810B32 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Base.xcconfig; path = Config/Base.xcconfig; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BD10353A1F6A5790D36E5F9E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2C0AB06D15A3CF54AF785916 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE7A0D4815B69C6E04B873A4 /* FennFocusCore.framework in Frameworks */,
+				2A88CB12E547ED68D14F8769 /* MLXLLM in Frameworks */,
+				117ED7BFF9BA245B7B860A6E /* MLXLMCommon in Frameworks */,
+				617D613F904D6651F645D240 /* Tokenizers in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		46AFF7BB339EB338C1494415 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				062D138A36674ADC90E11B7C /* FennFocusCore.framework in Frameworks */,
+				33134EA429D71D997846E4FD /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		91165B09EC21443951B3AE89 = {
+			isa = PBXGroup;
+			children = (
+				FC25E46B4A09EC2484810B32 /* Base.xcconfig */,
+				A9542CC8E1DAE44737FB2F5E /* Sources */,
+				230F49C6BC903493D73A4DF2 /* Shared */,
+				A68D28D61A9A97FC68D18346 /* Support */,
+				2B2DFFBB5AD984BABC8D518F /* Frameworks */,
+				E897B4CEC4A264A93FB8DAA3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E897B4CEC4A264A93FB8DAA3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B9BB23C9DB1801D2DEDDFB61 /* FennFocus.app */,
+				4A280702D9141FFEEB42343D /* FennFocusCore.framework */,
+				2DC9BDE68C1E20F69D48C26F /* FennFocusWidgets.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A9542CC8E1DAE44737FB2F5E /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				16FA8F6BE6AE2131408B2FAD /* FennFocusCore */,
+				9CA8C9D171CF615B7A77F90B /* FennFocus */,
+				1332DDE8CBFB05474BD4E674 /* FennFocusWidgets */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		16FA8F6BE6AE2131408B2FAD /* FennFocusCore */ = {
+			isa = PBXGroup;
+			children = (
+				1BEE0AD319C6AC06B4512ECF /* FennWidgetSnapshot.swift */,
+				76AC5F6A4E489D7D2F5431B4 /* KZToken.swift */,
+				4605D5BA2FC3B3C60241EB1F /* L10n.swift */,
+				AF13F5C7E584BF715A7D3E82 /* MacWidgetCoreBundle.swift */,
+				09B2C0B61F1B87F1496AE556 /* RhythmCore.swift */,
+				FB40B8A2FEB6C8934114261E /* WidgetReload.swift */,
+			);
+			path = FennFocusCore;
+			sourceTree = "<group>";
+		};
+		9CA8C9D171CF615B7A77F90B /* FennFocus */ = {
+			isa = PBXGroup;
+			children = (
+				7B02EEAB76F5F290A7F26FDE /* AIClient.swift */,
+				D2711E824B6101B98E6BAC50 /* AgendaViews.swift */,
+				EFFEF66A152B437DAD53FE58 /* CalendarBridge.swift */,
+				12B1EC1BACCF52F2A072CB57 /* Celebration.swift */,
+				08CF8A4B91591EDE5A8E5035 /* ClayArt.swift */,
+				E2E6E81533108B49987DA2ED /* CoachMessage.swift */,
+				424534F8F8BFB0E54D41DB5D /* CoachModuleView.swift */,
+				72C292E8857293D1E26DC01B /* CoachViewModel.swift */,
+				8039939086F768FED71581FC /* ConnectorsModuleView.swift */,
+				0D8E54C354C71A02EE44C999 /* DesktopWidgetGallery.swift */,
+				E3D4D5AB4B962E643C9C66A5 /* DictationController.swift */,
+				D15532AD5C9EA1E4D1045EA6 /* FennAI.swift */,
+				B2182BFE3108D73953BE1618 /* FennAgent.swift */,
+				30DE05BCBF89BA2F89551A6A /* FennCalendarCleanup.swift */,
+				01EB54CC67AAE6ADB20E4FD9 /* FennDayPlanner.swift */,
+				A233A689B72EE953679D3F1F /* FennDayView.swift */,
+				574C55E6A24808A5CAC5D799 /* FennDemo.swift */,
+				F2C6C01322BC252B2307404B /* FennDesign.swift */,
+				DD4C53A4CC12E9622FE46262 /* FennFocusApp.swift */,
+				45CBC98B8BEA415354AA76A1 /* FennFocusDial.swift */,
+				28A4094350B4F23F2126E132 /* FennHabits.swift */,
+				ED30E055D7EF61BF1F3821D9 /* FennIdeas.swift */,
+				2B9E68021821777B7A43F4E1 /* FennJournal.swift */,
+				2642C4A66804AA5D1A26E3E2 /* FennMCPServer.swift */,
+				7E05F52D16333A2C632DD7E3 /* FennMarkdown.swift */,
+				7E3C430D9E54A5738E16BC2F /* FennNotificationBrand.swift */,
+				3DC2E97B35EC9E63CD7A016A /* FennPeek.swift */,
+				8FFB7FDE32E6DAD6FE59323A /* FennQuotes.swift */,
+				7E70112EBB2009FD8DACF49C /* FennResurface.swift */,
+				693D840F09B306EB4CDFBE13 /* FennStyle.swift */,
+				0A22AEC88FEC933363551145 /* FennTaskCalendar.swift */,
+				692488FC3ED45B6680AEE1BD /* FennTasks.swift */,
+				08EB0E6FFB66E4D9F4CBF62C /* FennThinkingOrb.swift */,
+				FEFCC70AA412012B9CD0A0E7 /* FennVault.swift */,
+				8BBA955152E3328680889E4B /* FennVoice.swift */,
+				8BC50BB569B5B22D3BFA1A98 /* FennWidgetBridge.swift */,
+				C0AA127E0CA36EB4C969CE57 /* FocusModuleView.swift */,
+				F4748A78FC27779E0B1443E5 /* FocusMusic.swift */,
+				DF4CDF2B1103C13E70445AD8 /* FocusTimer.swift */,
+				811D4D5E03455F4B02FD790E /* HabitsModuleView.swift */,
+				BAC9832A2690C8796C15EFE9 /* HomeLayoutMac.swift */,
+				F622A99B9DA312C02410698E /* HotKey.swift */,
+				BD0E4CD0355F5178A0F9B5D9 /* IdeasModuleView.swift */,
+				1430B108C7EF092D0A20F232 /* IslandController.swift */,
+				F920515420EFD6E5A77758C0 /* IslandModel.swift */,
+				EA08ED62F2F0B0040F67FCD5 /* IslandRootView.swift */,
+				A4C73E3F6787D03A47317402 /* JournalModuleView.swift */,
+				7778DD5772546EA5D3181643 /* KeychainStore.swift */,
+				226C11C3A0BE1C2426CFCBC1 /* KnowledgeStore.swift */,
+				5648CE4EE305B70AEA438100 /* LocalBrain.swift */,
+				F1F1D77AA9D6BBA51B5ED8C7 /* LocalIntelligence.swift */,
+				A6FDA1BF0F888EEBD9B685B8 /* LocalModels.swift */,
+				81777ECFA3A532CB704872C0 /* LocalVoice.swift */,
+				5E368887D0BDFDD98D89C64F /* MacAgentTools.swift */,
+				86A4852E012265B99A089D0B /* MacBlocker.swift */,
+				4896977513B4D4F1FD198103 /* MacDesignSheet.swift */,
+				9199F99438103867E13C9DA2 /* MacMode.swift */,
+				1BD8BA98E6BBD64073774262 /* MacOnboardingView.swift */,
+				07B44B9ED4DAE0F78B579FCF /* MetricsStore.swift */,
+				08F92F74A377A525E0B8C83A /* NotchNotice.swift */,
+				E159FC5300A48E35F4120734 /* NotesModuleView.swift */,
+				900B7F56FF345127B7AADAF6 /* NotesStore.swift */,
+				366FA6888F34C2A6567E10E9 /* PebbleFace.swift */,
+				C60A61A4CA8C47F93BEB1011 /* PersonProfile.swift */,
+				040EFF9ADB1236D8E4A9F942 /* SyncFolder.swift */,
+				00B4F341A54005641FCC8723 /* TasksModuleView.swift */,
+				80D3FEA597DA7F0E971CE0E3 /* TodayModuleView.swift */,
+				F017ACFDB98CE4F0655FE415 /* Transcriber.swift */,
+				F15CF7BEF04B98003613F8FB /* WorkCalendar.swift */,
+			);
+			path = FennFocus;
+			sourceTree = "<group>";
+		};
+		1332DDE8CBFB05474BD4E674 /* FennFocusWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				CF994210E3DA98253F0D76E1 /* DesktopClayViews.swift */,
+				CA13ED7D037FBB26F3962A9E /* FennDesktopWidgets.swift */,
+				FC7DE30C35F6BDE953DEDD71 /* WidgetBundle.swift */,
+			);
+			path = FennFocusWidgets;
+			sourceTree = "<group>";
+		};
+		230F49C6BC903493D73A4DF2 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		A68D28D61A9A97FC68D18346 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				7DF34072C17E0610D68D580A /* Assets.xcassets */,
+				5B101DA7B1B6CC6550F5DCDD /* WidgetAssets.xcassets */,
+				57CA8F4ACB404E369C2D7515 /* FennFocus.entitlements */,
+				AD30600B0C3D543669E699E5 /* FennFocusWidgets.entitlements */,
+				B9EE24F9745EDB309FF321F2 /* Host-Info.plist */,
+				52E1E85081F8FCA2304BBC2E /* WidgetExtension-Info.plist */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		2B2DFFBB5AD984BABC8D518F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9CD1E9D80FD64FF214F402B8 /* WidgetKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		1441FFEE86FEF083D88E6DF9 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		C67716B728D59B0ACD3927A1 /* FennFocusCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 44A09541F95BB7A8511905DB /* Build configuration list for PBXNativeTarget "FennFocusCore" */;
+			buildPhases = (
+				1441FFEE86FEF083D88E6DF9 /* Headers */,
+				EE5F8EDD49F1FE7DD3390EAD /* Sources */,
+				BD10353A1F6A5790D36E5F9E /* Frameworks */,
+				75D550DD47E89223686656E1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FennFocusCore;
+			productName = FennFocusCore;
+			productReference = 4A280702D9141FFEEB42343D /* FennFocusCore.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		877AE0FE6EA22442D306CFAA /* FennFocus */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8C5F4EEE80237BEDEB9D3349 /* Build configuration list for PBXNativeTarget "FennFocus" */;
+			buildPhases = (
+				BA49BC19319F1D0B84A01254 /* Sources */,
+				2C0AB06D15A3CF54AF785916 /* Frameworks */,
+				7CB22589AAE22BC97542A6C1 /* Resources */,
+				42DE3841264F1BFCD360306A /* Embed Frameworks */,
+				13EB25F09D768013A34E08CC /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AB0E577C069CA231A8D34528 /* PBXTargetDependency */,
+				FC7F0B013E4173318FEEF337 /* PBXTargetDependency */,
+			);
+			packageProductDependencies = (
+				F9D61D5D9C07E32154B46BD2 /* MLXLLM */,
+				06F96FF1B896D22EDB554C4D /* MLXLMCommon */,
+				A9D5921B4AA4249BAD75C0BC /* Tokenizers */,
+			);
+			name = FennFocus;
+			productName = FennFocus;
+			productReference = B9BB23C9DB1801D2DEDDFB61 /* FennFocus.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A9D7DCA0FD010F266B20FA03 /* FennFocusWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 99AA00608186E55DDCFE0B7F /* Build configuration list for PBXNativeTarget "FennFocusWidgets" */;
+			buildPhases = (
+				3D406944F7908507253837E0 /* Sources */,
+				46AFF7BB339EB338C1494415 /* Frameworks */,
+				22BE02E2DA1580EDEEC0C4A4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F4CAF82B6203B9521A5E4F74 /* PBXTargetDependency */,
+			);
+			name = FennFocusWidgets;
+			productName = FennFocusWidgets;
+			productReference = 2DC9BDE68C1E20F69D48C26F /* FennFocusWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7540368EB4A5251EC8D4EAA0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					C67716B728D59B0ACD3927A1 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					877AE0FE6EA22442D306CFAA = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					A9D7DCA0FD010F266B20FA03 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 9CF1082128AB89C69336E816 /* Build configuration list for PBXProject "FennFocus" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				de,
+			);
+			mainGroup = 91165B09EC21443951B3AE89;
+			packageReferences = (
+				225C7C6314511B7AAE73442B /* XCRemoteSwiftPackageReference "mlx-swift-lm" */,
+				605DB69D3323161CF4F0CB14 /* XCRemoteSwiftPackageReference "swift-transformers" */,
+			);
+			productRefGroup = E897B4CEC4A264A93FB8DAA3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				877AE0FE6EA22442D306CFAA /* FennFocus */,
+				C67716B728D59B0ACD3927A1 /* FennFocusCore */,
+				A9D7DCA0FD010F266B20FA03 /* FennFocusWidgets */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		75D550DD47E89223686656E1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB22589AAE22BC97542A6C1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				956A1D3FAA7AC13D5A48A56F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22BE02E2DA1580EDEEC0C4A4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E4327E3E0A70B82DA859FC87 /* WidgetAssets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EE5F8EDD49F1FE7DD3390EAD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABA22A1F8000AAD9BD8933D1 /* FennWidgetSnapshot.swift in Sources */,
+				599BCCBA893393825D675FE4 /* KZToken.swift in Sources */,
+				03DAD6FEBF417ED7049DC72E /* L10n.swift in Sources */,
+				BA6EB872B259D8FC0E00A86B /* MacWidgetCoreBundle.swift in Sources */,
+				935589EB3AEC63CC5F7B24B8 /* RhythmCore.swift in Sources */,
+				4E18B899ECE01D092783743D /* WidgetReload.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BA49BC19319F1D0B84A01254 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F62BAF8168ABE8180131D272 /* AIClient.swift in Sources */,
+				C20892E3FE9EE3552FB6A56F /* AgendaViews.swift in Sources */,
+				B737ACCF779DF0A9A089A216 /* CalendarBridge.swift in Sources */,
+				6868D79CA7ADCA27C368F339 /* Celebration.swift in Sources */,
+				676CA636502C4114E8155736 /* ClayArt.swift in Sources */,
+				D908ECD4225EFFC10FFA8436 /* CoachMessage.swift in Sources */,
+				252E4D93E938FBB34EDB4A31 /* CoachModuleView.swift in Sources */,
+				24EB820767F2AEDCA442928E /* CoachViewModel.swift in Sources */,
+				546D5EF54B8A5F0A0FB221C9 /* ConnectorsModuleView.swift in Sources */,
+				E5AE2FA3A29324CB538B0C35 /* DesktopWidgetGallery.swift in Sources */,
+				A1AAABEAB21D1141F7D8DDCA /* DictationController.swift in Sources */,
+				F69DFB522A103301C7371C0D /* FennAI.swift in Sources */,
+				BCDDEA33D58931982E8A6B62 /* FennAgent.swift in Sources */,
+				603A04809786DF1F4E8E05F4 /* FennCalendarCleanup.swift in Sources */,
+				0AB1A7C893D7D36174EDE4A7 /* FennDayPlanner.swift in Sources */,
+				EDF1DFC2DB9DB7A693272478 /* FennDayView.swift in Sources */,
+				E726FFB014872C4A36809CF9 /* FennDemo.swift in Sources */,
+				CDE4BAC3413E72B32D68AE0B /* FennDesign.swift in Sources */,
+				4B9940E5D84916A7367A2D24 /* FennFocusApp.swift in Sources */,
+				DB7503CDE93CAFADF6E1D084 /* FennFocusDial.swift in Sources */,
+				6A0CD059B89108734C9B8EA1 /* FennHabits.swift in Sources */,
+				E235A9DBAB0E6283259FDFB1 /* FennIdeas.swift in Sources */,
+				C75166D65F43C8A22192817C /* FennJournal.swift in Sources */,
+				19D17825B22AEE335898B84D /* FennMCPServer.swift in Sources */,
+				BB2D8D11E5B6440D3EE08FDD /* FennMarkdown.swift in Sources */,
+				D3996B64595CC5C9EAD697D1 /* FennNotificationBrand.swift in Sources */,
+				87ACD9B6539FED1E86602A59 /* FennPeek.swift in Sources */,
+				4A93FD2E81149F05FC51D074 /* FennQuotes.swift in Sources */,
+				3EB13501C1D5861AC5B5F498 /* FennResurface.swift in Sources */,
+				BCA08E538F4B9F2A34C53434 /* FennStyle.swift in Sources */,
+				38BB4432C2812A2CB5934032 /* FennTaskCalendar.swift in Sources */,
+				E5251D945BDCD19AB37DBF94 /* FennTasks.swift in Sources */,
+				7BBC9539CD5804203C5B471A /* FennThinkingOrb.swift in Sources */,
+				4E52AA879B7EA3C8B7CAF55C /* FennVault.swift in Sources */,
+				5F3D53A56B3BA5B9C3284B9D /* FennVoice.swift in Sources */,
+				3E36CEB094F1467E19E0BDB5 /* FennWidgetBridge.swift in Sources */,
+				07BFC9A0F2BD0BD2E4BB3072 /* FocusModuleView.swift in Sources */,
+				A2AC77C82B92C2CFB7052980 /* FocusMusic.swift in Sources */,
+				75CAF200ECD58245A6D87055 /* FocusTimer.swift in Sources */,
+				15BB0E46FBC0AC844B4B79B4 /* HabitsModuleView.swift in Sources */,
+				878E8FA6091297AC87DD2C46 /* HomeLayoutMac.swift in Sources */,
+				6149052D5C2A9637082F5D94 /* HotKey.swift in Sources */,
+				4D18FAD4DF95F0B147F1EB1F /* IdeasModuleView.swift in Sources */,
+				FE0C71213DFB6661E08FFD1A /* IslandController.swift in Sources */,
+				8A33A9DF738312DA8BC288D1 /* IslandModel.swift in Sources */,
+				44BEC0F98102E50AAF07F736 /* IslandRootView.swift in Sources */,
+				79933CDE380F31EBE5CC31A1 /* JournalModuleView.swift in Sources */,
+				FB40A9886772329DD53580DD /* KeychainStore.swift in Sources */,
+				34C9EEBD15DB30532CA36114 /* KnowledgeStore.swift in Sources */,
+				E39A2CBF5336F0E2ABD2F81D /* LocalBrain.swift in Sources */,
+				6AA5BF3E2D7E727CFB4D000B /* LocalIntelligence.swift in Sources */,
+				E992D03319B6A342DC11AA59 /* LocalModels.swift in Sources */,
+				366B26E86D19FB7190015F6D /* LocalVoice.swift in Sources */,
+				C9A178BB67E43021AD2FD8BF /* MacAgentTools.swift in Sources */,
+				8DA5D81C917A905BAFAC3B5B /* MacBlocker.swift in Sources */,
+				E7700DE69B834E8A021A2492 /* MacDesignSheet.swift in Sources */,
+				1D23FD3625A809639B52E805 /* MacMode.swift in Sources */,
+				AA806879404BB001A9F65681 /* MacOnboardingView.swift in Sources */,
+				655F2FB43A2B2BA320488006 /* MetricsStore.swift in Sources */,
+				F3D1D59C9186D24A89112AC9 /* NotchNotice.swift in Sources */,
+				DC14580AF98B607422CF89FD /* NotesModuleView.swift in Sources */,
+				7F9CBEFD3217A8E0E6AE8E8F /* NotesStore.swift in Sources */,
+				0D09A99B940DC1EF7A52A19E /* PebbleFace.swift in Sources */,
+				9C395A6A8788A98321760E3E /* PersonProfile.swift in Sources */,
+				EDA00CC27DF54A08B3528AFB /* SyncFolder.swift in Sources */,
+				599D5F8EF0AA59351D853BD3 /* TasksModuleView.swift in Sources */,
+				496E587C90CD4338D68DD907 /* TodayModuleView.swift in Sources */,
+				3D8BFBCC7CBE0BD5BA17997F /* Transcriber.swift in Sources */,
+				2511380DBF3BBC49ED44B036 /* WorkCalendar.swift in Sources */,
+				1E099A1EB41A66B7F33315FF /* DesktopClayViews.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D406944F7908507253837E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				815C6CC332C81FE2E79240DB /* DesktopClayViews.swift in Sources */,
+				692AC10526E8AEFDE093F9DE /* FennDesktopWidgets.swift in Sources */,
+				6436F8C3DEA67882684B693F /* WidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AB0E577C069CA231A8D34528 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C67716B728D59B0ACD3927A1 /* FennFocusCore */;
+			targetProxy = 7A1FDB5820696575350FF424 /* PBXContainerItemProxy */;
+		};
+		FC7F0B013E4173318FEEF337 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A9D7DCA0FD010F266B20FA03 /* FennFocusWidgets */;
+			targetProxy = DA9B38DE5C278F707F61D7F1 /* PBXContainerItemProxy */;
+		};
+		F4CAF82B6203B9521A5E4F74 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C67716B728D59B0ACD3927A1 /* FennFocusCore */;
+			targetProxy = 41D3EABD07ACBB97177C62DB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0DEECA1A842E29E0AEC2CD7C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FC25E46B4A09EC2484810B32 /* Base.xcconfig */;
+			buildSettings = {
+
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		EDA3018DD545AA12A8AF4F5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FC25E46B4A09EC2484810B32 /* Base.xcconfig */;
+			buildSettings = {
+
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		7A131BC1A6DC414CF8BC9000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX).core";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		28FAA1DDDCD26B5711438C71 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX).core";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		2C4E6A207A5E1D90A9349E2A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Support/FennFocus.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Support/Host-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		26DE697E24E6035A627D9D71 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Support/FennFocus.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Support/Host-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		2E04E6AFF84C97D8E7BC97ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Support/FennFocusWidgets.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Support/WidgetExtension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX).widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FCC8EBB81E3C426C1927C2D3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Support/FennFocusWidgets.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Support/WidgetExtension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX).widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9CF1082128AB89C69336E816 /* Build configuration list for PBXProject "FennFocus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0DEECA1A842E29E0AEC2CD7C /* Debug */,
+				EDA3018DD545AA12A8AF4F5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		44A09541F95BB7A8511905DB /* Build configuration list for PBXNativeTarget "FennFocusCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A131BC1A6DC414CF8BC9000 /* Debug */,
+				28FAA1DDDCD26B5711438C71 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8C5F4EEE80237BEDEB9D3349 /* Build configuration list for PBXNativeTarget "FennFocus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C4E6A207A5E1D90A9349E2A /* Debug */,
+				26DE697E24E6035A627D9D71 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		99AA00608186E55DDCFE0B7F /* Build configuration list for PBXNativeTarget "FennFocusWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2E04E6AFF84C97D8E7BC97ED /* Debug */,
+				FCC8EBB81E3C426C1927C2D3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		225C7C6314511B7AAE73442B /* XCRemoteSwiftPackageReference "mlx-swift-lm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ml-explore/mlx-swift-lm";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 3.32.3;
+			};
+		};
+		605DB69D3323161CF4F0CB14 /* XCRemoteSwiftPackageReference "swift-transformers" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/huggingface/swift-transformers";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F9D61D5D9C07E32154B46BD2 /* MLXLLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 225C7C6314511B7AAE73442B /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLLM;
+		};
+		06F96FF1B896D22EDB554C4D /* MLXLMCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 225C7C6314511B7AAE73442B /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLMCommon;
+		};
+		A9D5921B4AA4249BAD75C0BC /* Tokenizers */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 605DB69D3323161CF4F0CB14 /* XCRemoteSwiftPackageReference "swift-transformers" */;
+			productName = Tokenizers;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 7540368EB4A5251EC8D4EAA0 /* Project object */;
+}

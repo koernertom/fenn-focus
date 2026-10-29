@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "page-food-summer.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
