@@ -106,25 +106,24 @@ Your coding agent then sees the same tools Fenn uses: tasks, day schedule, focus
 
 ## Install
 
-Fenn Focus needs macOS 14 or later on a Mac with Apple Silicon (M1 or newer).
+<img src="docs/install.gif" alt="Install in three steps: download FennFocus.zip, drag the app to Applications, click Open Anyway once. Then Fenn says hi in the notch." width="100%">
 
-**Download (easiest)**
+**[Download FennFocus.zip](https://github.com/koernertom/fenn-focus/releases/latest/download/FennFocus.zip)**. You need macOS 14 or later on Apple Silicon.
 
-1. Download `FennFocus.zip` from [Releases](https://github.com/koernertom/fenn-focus/releases/latest), open it and drag
-   **FennFocus** into your Applications folder.
-2. Open it. The first time, macOS says it can't check the app, because it isn't notarised by Apple. Go to
-   **System Settings › Privacy & Security** and click **Open Anyway**. You only do this once.
-3. Fenn appears in the notch and asks you a few questions. That's it.
+"Open Anyway" is under System Settings › Privacy & Security, because the app isn't notarised by Apple.
 
-**Build it yourself** (needs [Xcode](https://apps.apple.com/app/xcode/id497799835), one command)
+<details>
+<summary>Build from source</summary>
+
+Needs [Xcode](https://apps.apple.com/app/xcode/id497799835):
 
 ```bash
 git clone https://github.com/koernertom/fenn-focus.git && cd fenn-focus && ./Scripts/install.sh
 ```
 
-The script builds Fenn Focus, puts it into Applications and opens it. Developers can open the project in Xcode with
-`python3 Scripts/generate_xcodeproj.py && open FennFocus.xcodeproj`; desktop widgets need your own signing team in
-`Config/Local.xcconfig` (see `Config/Local.xcconfig.example`).
+Desktop widgets need your own signing team in `Config/Local.xcconfig` (see `Config/Local.xcconfig.example`).
+
+</details>
 
 ## Where your data lives
 
