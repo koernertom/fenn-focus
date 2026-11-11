@@ -16,8 +16,10 @@ subscription.
 [![License: MIT](https://img.shields.io/badge/license-MIT-0e4243)](LICENSE)
 [![Price: free](https://img.shields.io/badge/price-free-6b998c)](#faq)
 
-[Why Fenn](#why-fenn) · [Features](#features) · [How Fenn works](#how-fenn-works) · [Install](#install) ·
-[Models](docs/MODELS.md) · [FAQ](#faq)
+**[Website](https://koernertom.github.io/fenn-focus/)** · [Why Fenn](#why-fenn) · [Features](#features) ·
+[How Fenn works](#how-fenn-works) · [Install](#install) · [Models](docs/MODELS.md) · [FAQ](#faq)
+
+<img src="docs/screenshot.png" alt="Three Fenn Focus views: today's tasks, the focus timer hanging from the MacBook notch, and routines with an 8-week view" width="100%">
 
 </div>
 
@@ -176,7 +178,9 @@ docs                      model guide, diagrams
 ## Contributing
 
 Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Please keep it local-first and
-key-free.
+key-free. Good places to start are the issues labelled
+[good first issue](https://github.com/koernertom/fenn-focus/labels/good%20first%20issue): another app language, a model
+profile, a widget, or testing on a Mac without a notch. What changed between versions: [CHANGELOG.md](CHANGELOG.md).
 
 ## Disclaimer
 

@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fenn Focus – free local AI assistant for your Mac's notch</title>
+<meta name="description" content="Free, open-source assistant in your Mac's notch: tasks, calendar, Pomodoro timer, app blocker and routines. The AI runs locally with MLX, Ollama or LM Studio.">
+<link rel="canonical" href="https://koernertom.github.io/fenn-focus/">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4efe7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#081717" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fenn Focus">
+<meta property="og:title" content="Fenn Focus – a free, local-first AI assistant in your Mac's notch">
+<meta property="og:description" content="Tasks, calendar, focus timer, routines and notes in one small island, plus Fenn, a pebble agent that runs on your Mac. No account, no server. MIT.">
+<meta property="og:url" content="https://koernertom.github.io/fenn-focus/">
+<meta property="og:image" content="https://koernertom.github.io/fenn-focus/assets/og.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="Fenn Focus: a free, local-first AI assistant in your Mac's notch, with Fenn the pebble">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Fenn Focus – a free, local-first AI assistant in your Mac's notch">
+<meta name="twitter:description" content="Tasks, calendar, focus timer, routines and notes in the notch. The AI runs on your Mac with MLX, Ollama, LM Studio or Apple Intelligence. MIT.">
+<meta name="twitter:image" content="https://koernertom.github.io/fenn-focus/assets/og.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Fenn Focus",
+      "url": "https://koernertom.github.io/fenn-focus/",
+      "description": "A free, local-first AI assistant that lives in your Mac's notch: tasks, calendar, routines, notes and focus sessions, plus an agent that runs on-device with MLX, Ollama, LM Studio or Apple's on-device model.",
+      "operatingSystem": "macOS 14 or later",
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "Productivity",
+      "softwareRequirements": "macOS 14 or later; Apple Silicon for built-in models",
+      "downloadUrl": "https://github.com/koernertom/fenn-focus/releases/latest/download/FennFocus.zip",
+      "installUrl": "https://github.com/koernertom/fenn-focus/releases/latest",
+      "license": "https://opensource.org/licenses/MIT",
+      "isAccessibleForFree": true,
+      "inLanguage": ["en", "de"],
+      "image": "https://koernertom.github.io/fenn-focus/assets/og.png",
+      "sameAs": "https://github.com/koernertom/fenn-focus",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Is Fenn Focus really free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. It is MIT-licensed, has no paid tier and needs no account. The recommended models are Apache-2.0 and free to download." } },
+        { "@type": "Question", "name": "Does my data leave my Mac?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Not unless you choose it: a cloud model with your own key (nothing is sent until you switch on the consent for that provider), a model download from Hugging Face, or Spotify if you use it for focus music." } },
+        { "@type": "Question", "name": "Does it work without AI?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Tasks, calendar, focus timer, app blocker, routines and notes work without any model. The model adds the agent, day planning and note clean-up." } },
+        { "@type": "Question", "name": "Which Mac do I need?",
+          "acceptedAnswer": { "@type": "Answer", "text": "macOS 14 or later. Built-in models need Apple Silicon; 8 GB is enough for Qwen 3.5 4B." } },
+        { "@type": "Question", "name": "Does it work on Macs without a notch?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, it is the same app: the island docks under the menu bar or at a screen edge." } },
+        { "@type": "Question", "name": "Can everyone on my team use it at work?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Each person installs Fenn Focus on their own Mac; there is no server to run and no seats to buy. Check your company's rules for installing open-source apps first." } }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+@font-face{font-family:"Fenn Block";src:url(assets/fonts/FennBlock.ttf) format("truetype");font-display:swap}
+@font-face{font-family:"Fenn Dots";src:url(assets/fonts/FennDots-Regular.ttf) format("truetype");font-display:swap}
+
+:root{
+  --bg:#f4efe7;--surface:#fbf8f3;--sunk:#ede5da;--ink:#1c1917;--ink2:#57514b;--head:#0e4243;
+  --accent:#364f4a;--on-accent:#fff;--sage:#6b998c;--hair:rgba(28,25,23,.11);--code:#0e2a2a;--code-ink:#e7efec;
+  --aura:rgba(107,153,140,.30);--shadow:0 18px 50px rgba(14,66,67,.12);
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  --dots:"Fenn Dots",ui-monospace,Menlo,monospace;--block:"Fenn Block","Fenn Dots",ui-monospace,monospace;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#081717;--surface:#0d2525;--sunk:#0a1e1e;--ink:#f4f5f7;--ink2:#a9b8b5;--head:#e8efec;
+  --accent:#6b998c;--on-accent:#081f21;--sage:#94b0ad;--hair:rgba(255,255,255,.10);--code:#041010;--code-ink:#dfe9e6;
+  --aura:rgba(107,153,140,.22);--shadow:0 18px 50px rgba(0,0,0,.40);
+  color-scheme:dark;
+}}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.6 var(--sans);overflow-x:hidden}
+img,video{display:block;max-width:100%;height:auto}
+a{color:var(--accent);text-underline-offset:.18em}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--sage);outline-offset:3px;border-radius:6px}
+h1,h2,h3{color:var(--head);line-height:1.15;font-weight:600;margin:0}
+h2{font-size:clamp(1.75rem,1.2rem + 2vw,2.6rem);letter-spacing:-.01em;max-width:28ch}
+h3{font-size:1.15rem;font-weight:600}
+p{margin:0}
+code{font:500 .88em/1.4 var(--mono)}
+.wrap{width:min(1120px,100% - 32px);margin-inline:auto}
+.skip{position:absolute;left:-999px;top:8px;background:var(--surface);padding:8px 12px;border-radius:8px;z-index:9}
+.skip:focus{left:16px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0}
+.mark{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--head)}
+.mark img{width:30px;height:auto}
+.mark span{font:400 22px/1 var(--block);letter-spacing:.02em;padding-top:2px}
+.top nav{display:flex;gap:22px;font-size:16px}
+.top nav a{color:var(--ink2);text-decoration:none}
+.top nav a:hover{color:var(--ink)}
+@media (max-width:820px){.top nav a:not(.gh){display:none}}
+
+/* buttons */
+.btns{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 22px;border-radius:14px;font:600 17px/1 var(--sans);text-decoration:none;border:1.5px solid transparent;transition:transform .15s ease,background-color .15s ease}
+.btn svg{width:20px;height:20px;flex:none}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn.ghost{color:var(--head);border-color:var(--hair);background:transparent}
+.btn.ghost:hover{background:var(--sunk)}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}.btn.primary:hover{transform:none}}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:40px;align-items:center;padding:40px 0 28px}
+.hero h1{font-size:clamp(2.3rem,1.4rem + 3.6vw,4rem);letter-spacing:-.02em;max-width:15ch}
+.hero .lede{font-size:clamp(1.08rem,1rem + .35vw,1.25rem);color:var(--ink2);max-width:40ch;margin:22px 0 30px}
+.spec{font:400 14px/1.5 var(--dots);color:var(--ink2);margin-top:18px;letter-spacing:.02em}
+.pebble{position:relative;justify-self:center;width:min(330px,80%)}
+.pebble::before{content:"";position:absolute;inset:-18% -22% -8%;background:radial-gradient(closest-side,var(--aura),transparent);z-index:-1}
+.pebble img{width:100%;filter:drop-shadow(0 26px 30px rgba(14,66,67,.18))}
+@media (max-width:820px){
+  .hero{grid-template-columns:1fr;gap:8px;padding-top:16px}
+  .pebble{order:-1;width:150px;justify-self:start}
+}
+
+/* media frames */
+.frame{border-radius:20px;overflow:hidden;background:var(--sunk);box-shadow:var(--shadow);border:1px solid var(--hair)}
+.frame video,.frame img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.frame.shot img{aspect-ratio:auto;object-fit:contain}
+.caption{color:var(--ink2);font-size:16px;margin-top:14px;max-width:70ch}
+.demo{padding:18px 0 24px}
+
+/* sections */
+section{padding:72px 0}
+.intro{color:var(--ink2);max-width:60ch;margin-top:14px;font-size:1.08rem}
+.rule{border:0;border-top:1px solid var(--hair);margin:0}
+
+/* features */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:36px}
+.card{background:var(--surface);border:1px solid var(--hair);border-radius:18px;padding:22px}
+.card img{width:52px;height:52px;margin-bottom:12px}
+.card p{color:var(--ink2);font-size:16px;margin-top:6px;line-height:1.55}
+
+/* steps */
+.split{display:grid;grid-template-columns:.9fr 1.1fr;gap:44px;align-items:start;margin-top:36px}
+@media (max-width:900px){.split{grid-template-columns:1fr}}
+ol.steps{list-style:none;margin:36px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+@media (max-width:1000px){ol.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:620px){ol.steps{grid-template-columns:1fr}}
+.how-video{margin:40px 0 0}
+ol.steps li{display:grid;gap:8px;align-content:start}
+ol.steps .n{font:400 30px/1 var(--dots);color:var(--sage)}
+ol.steps p{color:var(--ink2);font-size:16px}
+
+/* tables */
+.tablewrap{overflow-x:auto;margin-top:28px;border:1px solid var(--hair);border-radius:16px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:16px;min-width:520px}
+th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--hair);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-weight:600;color:var(--head);background:var(--sunk)}
+td code{font-size:.82em;word-break:break-all}
+.yes{color:var(--accent);font-weight:600}
+@media (max-width:620px){table,table[style]{min-width:0!important;font-size:15px}th,td{padding:11px 10px}}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media (max-width:900px){.two{grid-template-columns:1fr}}
+.two h3{margin-top:36px}
+ul.ticks{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:10px;color:var(--ink2);font-size:16px}
+ul.ticks li{padding-left:26px;position:relative}
+ul.ticks li::before{content:"";position:absolute;left:2px;top:.55em;width:10px;height:10px;border-radius:50%;background:var(--sage)}
+
+/* code */
+.codebox{position:relative;margin-top:22px;background:var(--code);color:var(--code-ink);border-radius:14px;padding:18px 56px 18px 18px;overflow-x:auto}
+.codebox code{white-space:pre;font-size:14px}
+.copy{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:transparent;color:var(--code-ink);cursor:pointer;display:grid;place-items:center}
+.copy:hover{background:rgba(255,255,255,.08)}
+.copy svg{width:18px;height:18px}
+
+/* install */
+ol.install{list-style:none;padding:0;margin:0;display:grid;gap:18px}
+ol.install li{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:start}
+ol.install .n{font:400 30px/1 var(--dots);color:var(--sage)}
+ol.install p{color:var(--ink2);font-size:16px;margin-top:2px}
+.note{margin-top:24px;padding:16px 18px;border-radius:14px;background:var(--sunk);font-size:16px;color:var(--ink2)}
+details.src{margin-top:18px;font-size:16px}
+details.src summary{cursor:pointer;color:var(--accent);font-weight:600}
+
+/* faq */
+.faq{margin-top:28px;border-top:1px solid var(--hair)}
+.faq details{border-bottom:1px solid var(--hair)}
+.faq summary{list-style:none;cursor:pointer;padding:20px 40px 20px 0;font-weight:600;font-size:1.08rem;color:var(--head);position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";position:absolute;right:8px;top:50%;width:10px;height:10px;border-right:2px solid var(--sage);border-bottom:2px solid var(--sage);transform:translateY(-70%) rotate(45deg);transition:transform .2s}
+.faq details[open] summary::after{transform:translateY(-30%) rotate(225deg)}
+.faq details p{color:var(--ink2);padding:0 0 22px;max-width:70ch;font-size:16px}
+
+/* closing */
+.closing{text-align:center;padding:84px 0}
+.closing img{width:110px;margin:0 auto 18px}
+.closing h2{margin:0 auto;max-width:20ch}
+.closing .btns{justify-content:center;margin-top:28px}
+
+footer{border-top:1px solid var(--hair);padding:36px 0 48px;font-size:15px;color:var(--ink2)}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr;gap:32px}
+@media (max-width:820px){footer .cols{grid-template-columns:1fr}}
+footer h2{font-size:1rem;margin-bottom:8px;max-width:none}
+footer ul{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+footer .de{margin-top:14px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="wrap top">
+  <a class="mark" href="./" aria-label="Fenn Focus home">
+    <img src="assets/fenn.webp" alt="" width="30" height="36">
+    <span aria-hidden="true">FENN FOCUS</span>
+  </a>
+  <nav aria-label="Main">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#models">Models</a>
+    <a href="#install">Install</a>
+    <a href="#faq">FAQ</a>
+    <a class="gh" href="https://github.com/koernertom/fenn-focus">GitHub</a>
+  </nav>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>A free, local-first AI assistant in your Mac's notch.</h1>
+        <p class="lede">Tasks, calendar, routines, notes and focus sessions in one small island, plus Fenn, a pebble who plans your day with you. The AI runs on your Mac with MLX, Ollama, LM Studio or Apple's on-device model. No account, no server, no subscription.</p>
+        <div class="btns">
+          <a class="btn primary" href="https://github.com/koernertom/fenn-focus/releases/latest/download/FennFocus.zip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>
+            Download for Mac
+          </a>
+          <a class="btn ghost" href="https://github.com/koernertom/fenn-focus">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+            Source on GitHub
+          </a>
+        </div>
+        <p class="spec">FREE, MIT LICENSE, MACOS 14+, ENGLISH AND GERMAN</p>
+      </div>
+      <div class="pebble"><img src="assets/fenn.webp" alt="Fenn, a smiling pebble with a small sprout" width="520" height="624" fetchpriority="high"></div>
+    </div>
+
+    <figure class="demo" style="margin:0">
+      <div class="frame">
+        <video data-auto autoplay muted loop playsinline preload="auto" poster="assets/agent-flow-poster.jpg" width="1920" height="1080" aria-label="A dictated request in the Mac notch becomes a new task for tomorrow and a running 25-minute focus timer">
+          <source src="assets/agent-flow.mp4" type="video/mp4">
+        </video>
+      </div>
+      <figcaption class="caption">Say “remind me about the offer tomorrow and start 25 minutes on the pitch deck”. Fenn adds the task and starts the timer.</figcaption>
+    </figure>
+  </div>
+
+  <section id="screenshot" class="wrap" aria-labelledby="shot-h">
+    <h2 id="shot-h">Your day at a glance, right under the notch</h2>
+    <p class="intro">Tasks, the focus timer and your routines, a click or a sentence away. Open it with <kbd>⌃⌥F</kbd> or hover the notch. On Macs without a notch it docks under the menu bar or at a screen edge.</p>
+    <figure style="margin:32px 0 0">
+      <div class="frame shot">
+        <picture>
+          <source srcset="assets/screenshot.webp" type="image/webp">
+          <img src="assets/screenshot.png" alt="Three Fenn Focus views: today's tasks, the focus timer hanging from the MacBook notch, and routines with an 8-week view" decoding="async" fetchpriority="low" width="2000" height="1013" onerror="this.closest('section').hidden=true">
+        </picture>
+      </div>
+    </figure>
+  </section>
+
+  <hr class="rule wrap">
+
+  <section id="features" class="wrap" aria-labelledby="features-h">
+    <h2 id="features-h">Tasks, Pomodoro timer, app blocker and routines in one island</h2>
+    <p class="intro">Everything works without any AI. A model adds the agent, day planning and note clean-up.</p>
+    <div class="grid">
+      <article class="card"><img src="assets/icons/sparkles.webp" alt="" width="52" height="52" loading="lazy"><h3>An agent that acts</h3><p>Fenn creates tasks, plans your day around your meetings, moves tasks, starts focus blocks and switches modes. If something is unclear, it asks back.</p></article>
+      <article class="card"><img src="assets/icons/today.webp" alt="" width="52" height="52" loading="lazy"><h3>Today</h3><p>Focus time, routines, your calendar as a timeline and the tasks that matter now.</p></article>
+      <article class="card"><img src="assets/icons/tasks.webp" alt="" width="52" height="52" loading="lazy"><h3>Tasks</h3><p>Topics, priority, due dates and estimates. As a list, a day timeline or a review of where the time went. Dated tasks can show up in their own Apple Calendar.</p></article>
+      <article class="card"><img src="assets/icons/focus.webp" alt="" width="52" height="52" loading="lazy"><h3>Focus timer</h3><p>Pomodoro with presets and focus music, from Spotify or your own tracks.</p></article>
+      <article class="card"><img src="assets/icons/block.webp" alt="" width="52" height="52" loading="lazy"><h3>App blocker</h3><p>Distracting apps stay closed during a focus block. A whole browser too, if you pick one.</p></article>
+      <article class="card"><img src="assets/icons/habits.webp" alt="" width="52" height="52" loading="lazy"><h3>Routines</h3><p>Small habits stacked onto things you already do, with a two-minute version and an 8-week view.</p></article>
+      <article class="card"><img src="assets/icons/notes.webp" alt="" width="52" height="52" loading="lazy"><h3>Notes, ideas, journal</h3><p>Typed or dictated with on-device speech recognition. The AI turns a note into a title, summary and to-dos.</p></article>
+      <article class="card"><img src="assets/icons/profile.webp" alt="" width="52" height="52" loading="lazy"><h3>Your own assistant</h3><p>A few friendly questions on first launch: what you do, your working hours, your best focus time and how Fenn should talk to you. Saved as you go, editable any time.</p></article>
+      <article class="card"><img src="assets/icons/sliders.webp" alt="" width="52" height="52" loading="lazy"><h3>Modes and widgets</h3><p>Focus, Leisure, Recovery or your own modes, each with its own modules and app block. Desktop widgets for Today, tasks, routines, Pomodoro and Fenn.</p></article>
+      <article class="card"><img src="assets/icons/link.webp" alt="" width="52" height="52" loading="lazy"><h3>MCP server</h3><p>Let Claude Code, Cursor or any MCP client read and, if you allow it, change your tasks and day. Local only and off until you switch it on.</p></article>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <section id="how" class="wrap" aria-labelledby="how-h">
+    <h2 id="how-h">How the local agent works</h2>
+    <ol class="steps">
+      <li><span class="n" aria-hidden="true">01</span><h3>Ask</h3><p>Type in the island, press ⌃⌥F and dictate, or let another agent call Fenn's tools over MCP.</p></li>
+      <li><span class="n" aria-hidden="true">02</span><h3>Situation</h3><p>Fenn builds the context fresh for every request: your profile and goals, recent journal entries, routines, the last seven days, a running timer and the best matching notes from your second brain.</p></li>
+      <li><span class="n" aria-hidden="true">03</span><h3>Agent loop</h3><p>Up to eight steps. Small models only see the tools that fit. Tools that start something only run when you asked for it, and each action runs once per request.</p></li>
+      <li><span class="n" aria-hidden="true">04</span><h3>Action</h3><p>Tasks, calendar, timer, app blocker, routines, ideas and memory change in your own folder and apps. Simple commands like “25 minutes focus” work without any model.</p></li>
+    </ol>
+    <figure class="how-video">
+      <div class="frame">
+        <video data-lazy muted loop playsinline preload="none" poster="assets/agent-architecture-poster.jpg" width="1920" height="1080" aria-label="Diagram of the Fenn agent: input, situation, agent loop with model router, tools and effects on your Mac">
+          <source src="assets/agent-architecture.mp4" type="video/mp4">
+        </video>
+      </div>
+    </figure>
+  </section>
+
+  <hr class="rule wrap">
+
+  <section id="models" class="wrap" aria-labelledby="models-h">
+    <h2 id="models-h">Local AI with MLX, Ollama, LM Studio or Apple Intelligence</h2>
+    <p class="intro">Fenn Focus never picks a cloud model for you. A key is only needed if you choose a cloud provider yourself.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">Runs with</th><th scope="col">Key needed</th><th scope="col">Leaves your Mac</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Built-in:</strong> downloads an open model (Qwen 3.5, Gemma 4 …) and runs it with MLX</td><td class="yes">no</td><td class="yes">no</td></tr>
+          <tr><td>Ollama</td><td class="yes">no</td><td class="yes">no</td></tr>
+          <tr><td>LM Studio</td><td class="yes">no</td><td class="yes">no</td></tr>
+          <tr><td>Apple on-device model (macOS 26, Apple Intelligence)</td><td class="yes">no</td><td class="yes">no</td></tr>
+          <tr><td>Claude, OpenRouter, any OpenAI-compatible server</td><td>your own</td><td>yes, after you agree once</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two">
+      <div>
+        <h3>Which model fits your Mac</h3>
+        <div class="tablewrap" style="margin-top:16px">
+          <table style="min-width:420px">
+            <thead><tr><th scope="col">Unified memory</th><th scope="col">Model</th><th scope="col">Ollama</th></tr></thead>
+            <tbody>
+              <tr><td>8 GB</td><td>Qwen 3.5 4B</td><td><code>qwen3.5:4b</code></td></tr>
+              <tr><td>16 GB</td><td>Qwen 3.5 9B</td><td><code>qwen3.5:9b</code></td></tr>
+              <tr><td>24–32 GB</td><td>Gemma 4 26B A4B</td><td><code>gemma4:26b</code></td></tr>
+              <tr><td>32 GB</td><td>Qwen 3.6 35B A3B</td><td><code>qwen3.6:35b-a3b</code></td></tr>
+              <tr><td>48 GB+</td><td>Qwen 3.8 27B</td><td><code>qwen3.8:27b</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="caption">All recommended models are Apache-2.0. Details in the <a href="https://github.com/koernertom/fenn-focus/blob/main/docs/MODELS.md">model guide</a>.</p>
+      </div>
+      <div>
+        <h3>Made for small models</h3>
+        <ul class="ticks">
+          <li>Thinking is switched off: faster answers, fewer loops.</li>
+          <li>Only the tools that fit your request are sent, so small models choose better.</li>
+          <li>The built-in model stays loaded after first use; Ollama keeps it warm for 30 minutes.</li>
+          <li>If Ollama or LM Studio is already running, Fenn Focus picks the best of the models you have.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <section id="privacy" class="wrap" aria-labelledby="privacy-h">
+    <h2 id="privacy-h">What stays on your Mac</h2>
+    <p class="intro">There is no telemetry and no Fenn Focus server. Your data is plain Markdown and JSON in a folder you choose.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">What</th><th scope="col">Where</th></tr></thead>
+        <tbody>
+          <tr><td>Tasks, routines, notes, ideas, journal</td><td>Your Fenn Focus folder (iCloud Drive or any folder) as Markdown and JSON, or inside the app until you pick one</td></tr>
+          <tr><td>Downloaded models</td><td>The app's own container on your Mac</td></tr>
+          <tr><td>API keys, if you add any</td><td>macOS Keychain, this Mac only</td></tr>
+          <tr><td>Settings</td><td>macOS user defaults of the app</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <section id="mcp" class="wrap" aria-labelledby="mcp-h">
+    <h2 id="mcp-h">Use Fenn from Claude Code or Cursor via MCP</h2>
+    <p class="intro">Switch on Connections › Fenn as an MCP server, choose “Read only” or “Read and change”, and paste the line the app shows. It listens on 127.0.0.1 only and needs a token. For Claude Code it looks like this:</p>
+    <div class="codebox">
+      <code id="mcp-cmd">claude mcp add --transport http fenn http://127.0.0.1:&lt;port&gt;/mcp --header "Authorization: Bearer &lt;token&gt;"</code>
+      <button class="copy" type="button" data-copy="mcp-cmd" aria-label="Copy command">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+      </button>
+    </div>
+    <p class="caption">Your coding agent then sees the same tools Fenn uses: tasks, day schedule, focus, routines and more.</p>
+  </section>
+
+  <hr class="rule wrap">
+
+  <section id="install" class="wrap" aria-labelledby="install-h">
+    <h2 id="install-h">Install in three steps</h2>
+    <div class="split">
+      <div>
+        <ol class="install">
+          <li><span class="n" aria-hidden="true">01</span><div><h3>Download</h3><p><a href="https://github.com/koernertom/fenn-focus/releases/latest/download/FennFocus.zip">FennFocus.zip</a> from the latest release and unzip it.</p></div></li>
+          <li><span class="n" aria-hidden="true">02</span><div><h3>Drag to Applications</h3><p>Move Fenn Focus into your Applications folder and open it.</p></div></li>
+          <li><span class="n" aria-hidden="true">03</span><div><h3>Open Anyway, once</h3><p>Go to System Settings › Privacy &amp; Security and click “Open Anyway”. Then Fenn says hi in the notch.</p></div></li>
+        </ol>
+        <p class="note">Why step 3: the app isn’t notarised by Apple, so macOS asks once. You can read and build every line of the code yourself.</p>
+        <details class="src">
+          <summary>Build from source</summary>
+          <p class="caption">Needs Xcode. Desktop widgets need your own signing team in <code>Config/Local.xcconfig</code>.</p>
+          <div class="codebox">
+            <code id="src-cmd">git clone https://github.com/koernertom/fenn-focus.git &amp;&amp; cd fenn-focus &amp;&amp; ./Scripts/install.sh</code>
+            <button class="copy" type="button" data-copy="src-cmd" aria-label="Copy command">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+            </button>
+          </div>
+        </details>
+      </div>
+      <figure style="margin:0">
+        <div class="frame">
+          <video data-lazy muted loop playsinline preload="none" poster="assets/install-poster.jpg" width="1920" height="1080" aria-label="Install in three steps: download FennFocus.zip, drag the app to Applications, click Open Anyway once">
+            <source src="assets/install.mp4" type="video/mp4">
+          </video>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <hr class="rule wrap">
+
+  <section id="faq" class="wrap" aria-labelledby="faq-h">
+    <h2 id="faq-h">Questions</h2>
+    <div class="faq">
+      <details><summary>Is Fenn Focus really free?</summary><p>Yes. It is MIT-licensed, has no paid tier and needs no account. The recommended models are Apache-2.0 and free to download.</p></details>
+      <details><summary>Does my data leave my Mac?</summary><p>Not unless you choose it: a cloud model with your own key (nothing is sent until you switch on the consent for that provider, which also lists what gets sent), a model download from Hugging Face, or Spotify if you use it for focus music.</p></details>
+      <details><summary>Does it work without AI?</summary><p>Yes. Tasks, calendar, focus timer, app blocker, routines and notes work without any model. The model adds the agent, day planning and note clean-up.</p></details>
+      <details><summary>Which Mac do I need?</summary><p>macOS 14 or later. Built-in models need Apple Silicon; 8 GB is enough for Qwen 3.5 4B.</p></details>
+      <details><summary>Does it work on Macs without a notch?</summary><p>Yes, it is the same app: the island docks under the menu bar or at a screen edge.</p></details>
+      <details><summary>Can everyone on my team use it at work?</summary><p>Yes. Each person installs Fenn Focus on their own Mac; there is no server to run and no seats to buy. Everything stays in each person's own folder. Check your company's rules for installing open-source apps first.</p></details>
+      <details><summary>Can I help?</summary><p>Issues and pull requests are welcome on <a href="https://github.com/koernertom/fenn-focus">GitHub</a>. Please keep it local-first and key-free.</p></details>
+    </div>
+  </section>
+
+  <section class="wrap closing" aria-labelledby="closing-h">
+    <img src="assets/fenn.webp" alt="" width="520" height="624" loading="lazy">
+    <h2 id="closing-h">Give your notch something to do.</h2>
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/koernertom/fenn-focus/releases/latest/download/FennFocus.zip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></svg>
+        Download for Mac
+      </a>
+      <a class="btn ghost" href="https://github.com/koernertom/fenn-focus">Star on GitHub</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap cols">
+    <div>
+      <h2>Disclaimer</h2>
+      <p>Fenn Focus was written with the help of AI coding tools and reviewed by a person, but it has not been audited. It comes as is, without any warranty. Keep a backup of your Fenn Focus folder.</p>
+      <p class="de" lang="de">Deutsch: Fenn Focus ist kostenlos, läuft lokal und spricht Deutsch und Englisch.</p>
+    </div>
+    <div>
+      <h2>Project</h2>
+      <ul>
+        <li><a href="https://github.com/koernertom/fenn-focus">Source code</a></li>
+        <li><a href="https://github.com/koernertom/fenn-focus/releases">Releases</a></li>
+        <li><a href="https://github.com/koernertom/fenn-focus/blob/main/docs/MODELS.md">Model guide</a></li>
+        <li><a href="https://github.com/koernertom/fenn-focus/blob/main/SECURITY.md">Security</a></li>
+        <li><a href="https://github.com/koernertom/fenn-focus/blob/main/LICENSE">MIT license</a>, <a href="https://github.com/koernertom/fenn-focus/blob/main/THIRD_PARTY_NOTICES.md">third-party notices</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const still = matchMedia("(prefers-reduced-motion: reduce)");
+  const videos = [...document.querySelectorAll("video[data-auto], video[data-lazy]")];
+  const calm = v => { v.removeAttribute("autoplay"); v.pause(); v.controls = true; };
+  if (still.matches) { videos.forEach(calm); }
+  else if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(entries => entries.forEach(e => {
+      const v = e.target;
+      if (e.isIntersecting) { if (v.preload === "none") v.preload = "auto"; v.play().catch(() => { v.controls = true; }); }
+      else v.pause();
+    }), { rootMargin: "120px" });
+    videos.forEach(v => io.observe(v));
+  }
+  document.querySelectorAll("button[data-copy]").forEach(b => b.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById(b.dataset.copy).textContent);
+      b.setAttribute("aria-label", "Copied");
+      setTimeout(() => b.setAttribute("aria-label", "Copy command"), 1600);
+    } catch { /* clipboard blocked: the text stays selectable */ }
+  }));
+})();
+</script>
+</body>
+</html>
