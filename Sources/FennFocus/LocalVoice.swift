@@ -15,6 +15,8 @@ enum LocalVoice {
             }
             return reply
         }
+        // "Start 25 minutes focus and add the task …" is more than a timer: with a model, the agent does all of it.
+        if FennAI.isConfigured, wantsMore(text) { return nil }
         guard let change = PomodoroVoice.parse(text) else { return nil }
         let running = focus.isActive
         focus.applyVoice(change)
@@ -27,5 +29,12 @@ enum LocalVoice {
             return tr("Pomodoro gestartet. \(focus.summary).", "Pomodoro started. \(focus.summary).")
         }
         return tr("Gespeichert. \(focus.summary).", "Saved. \(focus.summary).")
+    }
+
+    /// Words that ask for something besides the timer: a task, a reminder, a date, a note.
+    private static func wantsMore(_ text: String) -> Bool {
+        let lower = text.lowercased()
+        return ["aufgab", "task", "todo", "to-do", "erinner", "remind", "morgen", "tomorrow", "termin", "meeting",
+                "notiz", "note", "idee", "idea", "routine", "habit"].contains { lower.contains($0) }
     }
 }

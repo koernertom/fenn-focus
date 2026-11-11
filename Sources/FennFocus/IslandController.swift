@@ -350,8 +350,12 @@ final class IslandController: NSObject, NSWindowDelegate {
                     let reply = try await FennAI.complete(system: "Antworte auf Deutsch, in einem Satz.", messages: [AIMessage(role: .user, text: "Warum helfen Fokusblöcke?")],
                                                           maxTokens: 200, config: config)
                     print("[\(server.title)] \(String(format: "%.1f", Date().timeIntervalSince(start))) s: \(reply)")
-                    let step = try await FennAI.step(system: "Du bist Fenn auf dem Mac. Nutze Werkzeuge, wenn sinnvoll.", entries: [.user("Leg mir für morgen die Aufgabe Steuer erledigen an.")],
-                                                     tools: FennAgent.focusTools(FennAgent.shared.tools, for: "Leg mir für morgen die Aufgabe Steuer erledigen an."), config: config)
+                    // -FennQAPrompt "…" checks one request with the real system prompt and the tools a local model would get.
+                    let prompt = defaults.string(forKey: "FennQAPrompt") ?? "Leg mir für morgen die Aufgabe Steuer erledigen an."
+                    let tools = FennAgent.focusTools(FennAgent.shared.tools, for: prompt)
+                    print("[Tools] \(tools.map(\.name))")
+                    let step = try await FennAI.step(system: FennAgent.shared.qaSystem(for: prompt), entries: [.user(prompt)],
+                                                     tools: tools, config: config)
                     print("[Agent] \(String(format: "%.1f", Date().timeIntervalSince(start))) s: calls=\(step.calls.map { "\($0.name) \($0.arguments)" }) text=\(step.text.prefix(200))")
                 } catch {
                     print("[\(server.title)] Fehler: \(error.localizedDescription)")

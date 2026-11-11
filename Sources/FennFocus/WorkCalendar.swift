@@ -141,11 +141,11 @@ final class WorkCalendar: ObservableObject {
             return AgendaEvent(id: title, title: title, start: start, end: start.addingTimeInterval(length * 60), isAllDay: false, calendar: calendar, joinURL: join)
         }
         return [
-            event(tr("Weekly Sync, Produkt", "Weekly sync, Product"), 15, 45, "Outlook", teams),
-            event("Pitch Q4 Review", 120, 60, "Outlook", teams),
-            event(tr("1:1 mit Lara", "1:1 with Lara"), 210, 30, "Outlook", teams),
-            event(tr("Kundentermin Nordlicht", "Client call Nordlicht"), 24 * 60 - 120, 60, "iCloud"),
-            event("Planning Sprint 42", 24 * 60 + 30, 90, "Outlook", teams)
+            event(tr("Weekly Sync, Produkt", "Weekly sync, Product"), 15, 45, tr("Arbeit", "Work"), teams),
+            event("Pitch Q4 Review", 120, 60, tr("Arbeit", "Work"), teams),
+            event(tr("1:1 mit Lara", "1:1 with Lara"), 210, 30, tr("Arbeit", "Work"), teams),
+            event(tr("Kundentermin Nordlicht", "Client call Nordlicht"), 24 * 60 - 120, 60, tr("Privat", "Personal")),
+            event("Planning Sprint 42", 24 * 60 + 30, 90, tr("Arbeit", "Work"), teams)
         ]
     }
 

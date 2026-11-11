@@ -278,6 +278,10 @@ final class FennAgent: ObservableObject {
     erst nach Zustimmung mit update_task umsetzen. Termine mit anderen Leuten nicht verschieben, nur vorschlagen.
     """
 
+    #if DEBUG
+    func qaSystem(for question: String) -> String { system(for: question) }
+    #endif
+
     private func system(for question: String) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "de_DE")
@@ -298,8 +302,23 @@ final class FennAgent: ObservableObject {
         - Antworte auf \(tr("Deutsch", "English")), du-Form. Markdown nur sparsam (fett, kurze Listen). Keine Mittelpunkte (·) zwischen Wörtern, stattdessen Komma oder neuer Satz.
 
         Jetzt: \(formatter.string(from: Date())).
+        \(Self.nextDays())
         \(context(question))
         """
+    }
+
+    /// Small models miscount weekdays ("nächsten Dienstag"), so the next week is spelled out with dates.
+    private static func nextDays() -> String {
+        let calendar = Calendar.current
+        let weekday = DateFormatter()
+        weekday.locale = Locale(identifier: "de_DE")
+        weekday.dateFormat = "EEEE"
+        let days = (1...7).compactMap { offset -> String? in
+            guard let date = calendar.date(byAdding: .day, value: offset, to: Date()) else { return nil }
+            let label = offset == 1 ? "morgen (\(weekday.string(from: date)))" : weekday.string(from: date)
+            return "\(label) = \(date.formatted(.iso8601.year().month().day()))"
+        }
+        return "Die nächsten Tage: " + days.joined(separator: ", ") + "."
     }
 
     /// Stable text of the arguments, to spot the same call twice.
@@ -312,11 +331,13 @@ final class FennAgent: ObservableObject {
     /// about, plus the overview. Nothing recognisable → every tool, so a "yes, do it" still works.
     static func focusTools(_ tools: [AgentTool], for text: String) -> [AgentTool] {
         let groups: [(words: [String], tools: [String])] = [
-            (["aufgab", "task", "todo", "to-do", "erledig", "done", "abhak", "fällig", "deadline", "priorit"],
+            (["aufgab", "task", "todo", "to-do", "erledig", "done", "abhak", "fällig", "deadline", "priorit", "erinner", "remind"],
              ["add_tasks", "list_tasks", "complete_task", "update_task", "delete_task"]),
+            // A date usually comes with something to put on it ("tomorrow", "Montag"), so tasks come along.
             (["heute", "morgen", "tag", "termin", "kalender", "plan", "woche", "zeit", "today", "tomorrow", "day", "meeting", "calendar", "schedule", "week"],
-             ["day_schedule", "list_tasks"]),
-            (["fokus", "focus", "pomodoro", "konzentr", "timer", "pause", "break", "ablenk", "distract", "sperr", "block"],
+             ["day_schedule", "list_tasks", "add_tasks", "update_task"]),
+            (["fokus", "focus", "pomodoro", "konzentr", "timer", "pause", "break", "ablenk", "distract", "sperr", "block",
+              "minut", "stunde", "hour", "start"],
              ["start_focus", "stop_focus", "set_pomodoro", "block_distractions", "add_block_rule"]),
             (["routine", "gewohnheit", "habit"], ["list_habits", "check_habit", "add_habit"]),
             (["idee", "idea", "brainstorm", "einfall"], ["capture_idea", "list_ideas", "brainstorm_idea"]),
@@ -353,7 +374,7 @@ final class FennAgent: ObservableObject {
     private static func claimsAction(_ text: String) -> Bool {
         let lower = text.lowercased()
         return ["angelegt", "eingetragen", "gestartet", "gesetzt", "erledigt", "gespeichert", "notiert", "hinzugefügt", "abgehakt",
-                "gemacht:", "added", "logged", "started", "saved"].contains { lower.contains($0) }
+                "gemacht:", "verschoben", "erstellt", "added", "logged", "started", "saved", "moved", "created", "scheduled"].contains { lower.contains($0) }
     }
 
     private static func statusLine(for tool: AgentTool) -> String {

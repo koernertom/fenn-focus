@@ -365,7 +365,7 @@ public enum PomodoroVoice {
         let hasWorkLabel = text.contains("arbeits") || text.contains("work minute")
             || match(#"\d+\s*(?:minuten|min|minutes|stunden|stunde|hours|hour|h)\s*arbeit"#, in: text) != nil
         let hasBreakLabel = text.contains("pausen") || text.contains("break minute")
-            || match(#"\d+\s*(?:minuten|min|minutes)\s*pause"#, in: text) != nil
+            || match(#"\d+\s*(?:minuten|minutes|minute|min)\s*pause"#, in: text) != nil
         let hasTotalLabel = text.contains("gesamt") || text.contains("fenster") || text.contains("insgesamt") || text.contains("total")
         guard hasPomo || hasFocus || hasWorkLabel || hasBreakLabel || hasTotalLabel else { return nil }
 
@@ -376,12 +376,12 @@ public enum PomodoroVoice {
         }
         if let hours = match(#"(\d+)\s*(?:stunden|stunde|hours|hour|h)\s*arbeit"#, in: text), let value = Int(hours[1]) {
             change.workMinutes = value * 60
-        } else if let mins = match(#"(\d+)\s*(?:minuten|min|minutes)\s*arbeit"#, in: text), let value = Int(mins[1]) {
+        } else if let mins = match(#"(\d+)\s*(?:minuten|minutes|minute|min)\s*arbeit"#, in: text), let value = Int(mins[1]) {
             change.workMinutes = value
         } else if let labeled = match(#"arbeits?(?:minuten|zeit|minutes)?\s*(?:auf\s+)?(\d+)"#, in: text), let value = Int(labeled[1]) {
             change.workMinutes = value
         }
-        if let mins = match(#"(\d+)\s*(?:minuten|min|minutes)\s*pause"#, in: text), let value = Int(mins[1]) {
+        if let mins = match(#"(\d+)\s*(?:minuten|minutes|minute|min)\s*pause"#, in: text), let value = Int(mins[1]) {
             change.breakMinutes = value
         } else if let labeled = match(#"pausen?(?:minuten|zeit|minutes)?\s*(?:auf\s+)?(\d+)"#, in: text), let value = Int(labeled[1]) {
             change.breakMinutes = value
@@ -394,7 +394,7 @@ public enum PomodoroVoice {
                   (hasPomo || hasFocus || hasTotalLabel) {
             change.totalMinutes = value * 60
         }
-        if change.workMinutes == nil, let mins = match(#"(\d+)\s*(?:minuten|min|minutes)\b"#, in: text), let value = Int(mins[1]),
+        if change.workMinutes == nil, let mins = match(#"(\d+)\s*(?:minuten|minutes|minute|min)\b"#, in: text), let value = Int(mins[1]),
            (hasFocus || hasPomo), !hasBreakLabel, change.breakMinutes == nil {
             let aroundPause = text.contains("pause")
             if !aroundPause { change.workMinutes = value }

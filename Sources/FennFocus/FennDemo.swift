@@ -43,7 +43,7 @@ enum FennDemo {
         var plan = JournalEntry(kind: .planDay, date: date(0, 7, 45))
         plan.answers = [
             JournalAnswer(question: JournalKind.planDay.questions[0], answer: tr("Pitch-Deck für Nordlicht fertig machen und das Angebot rausschicken.", "Finish the Nordlicht pitch deck and send the proposal.")),
-            JournalAnswer(question: JournalKind.planDay.questions[1], answer: tr("9:30 bis 11:00, nur das Deck – Slack aus.", "9:30 to 11:00, only the deck – Slack off.")),
+            JournalAnswer(question: JournalKind.planDay.questions[1], answer: tr("9:30 bis 11:00, nur das Deck – Chat aus.", "9:30 to 11:00, only the deck – chat off.")),
             JournalAnswer(question: JournalKind.planDay.questions[2], answer: tr("Das Weekly zieht sich – dann kürze ich die Agenda auf drei Punkte.", "The weekly runs long – then I cut the agenda to three points.")),
             JournalAnswer(question: tr("Was ist das eine Ergebnis, das der Fokusblock liefern soll?", "What's the one result the focus block should deliver?"),
                           answer: tr("Die Story-Folien 1–6 stehen.", "Story slides 1–6 are done."), isFollowUp: true)
@@ -130,8 +130,8 @@ enum FennDemo {
 
     static let coach: [(question: String, answer: String)] = [
         (tr("Ich hab heute nur 90 Minuten ohne Termine – was mache ich zuerst?", "I only have 90 minutes without meetings today – what first?"),
-         tr("**Das Pitch-Deck, und nur das:**\n\n1. **Fokusblock 9:30–11:00** – Story-Folien 1–6\n2. **Danach 10 min Pause** – kurz raus\n3. **Angebot** in der Lücke nach dem Mittag\n\n> Slack und Mail bleiben bis 11 zu – ich sperre sie dir, wenn du willst.",
-            "**The pitch deck, and only that:**\n\n1. **Focus block 9:30–11:00** – story slides 1–6\n2. **Then a 10 min break** – step outside\n3. **Proposal** in the gap after lunch\n\n> Slack and email stay closed until 11 – I'll block them if you like."))
+         tr("**Das Pitch-Deck, und nur das:**\n\n1. **Fokusblock 9:30–11:00** – Story-Folien 1–6\n2. **Danach 10 min Pause** – kurz raus\n3. **Angebot** in der Lücke nach dem Mittag\n\n> Chat und Mail bleiben bis 11 zu – ich sperre sie dir, wenn du willst.",
+            "**The pitch deck, and only that:**\n\n1. **Focus block 9:30–11:00** – story slides 1–6\n2. **Then a 10 min break** – step outside\n3. **Proposal** in the gap after lunch\n\n> Chat and email stay closed until 11 – I'll block them if you like."))
     ]
 
     static let notes: [(title: String, body: String)] = [

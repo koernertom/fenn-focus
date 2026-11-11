@@ -40,6 +40,7 @@ enum RhythmCoreCheck {
         expect(PomodoroVoice.parse("Starte 25 Minuten Fokus")?.workMinutes == 25, "25 minute focus sets work")
         expect(PomodoroVoice.parse("Starte 25 Minuten Fokus")?.totalMinutes == nil, "25 minute focus leaves the window")
         expect(PomodoroVoice.parse("Wie starte ich den Fokus?") == nil, "a question does not start")
+        expect(PomodoroVoice.parse("Start 45 minute focus")?.workMinutes == 45, "singular minute sets work")
 
         let begin = calendar.date(from: DateComponents(year: 2026, month: 10, day: 2, hour: 10))!
         let settings = PomodoroSettings(totalMinutes: 120, workMinutes: 50, breakMinutes: 10)

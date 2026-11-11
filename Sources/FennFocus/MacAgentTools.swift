@@ -59,7 +59,9 @@ enum MacAgentTools {
                 var change = PomodoroVoiceChange(start: (args["start"] as? Bool) ?? false)
                 if let hours = (args["total_hours"] as? NSNumber)?.intValue { change.totalMinutes = hours * 60 }
                 if let minutes = (args["total_minutes"] as? NSNumber)?.intValue { change.totalMinutes = minutes }
-                if let work = (args["work_minutes"] as? NSNumber)?.intValue { change.workMinutes = work }
+                // Small models mix this up with start_focus and send "minutes" and "task" here too.
+                if let work = ((args["work_minutes"] ?? args["minutes"]) as? NSNumber)?.intValue { change.workMinutes = work }
+                if let task = args["task"] as? String, !task.isEmpty { c.focus.taskTitle = task }
                 if let brk = (args["break_minutes"] as? NSNumber)?.intValue { change.breakMinutes = brk }
                 c.focus.applyVoice(change)
                 if change.start { c.model.module = .focus }
