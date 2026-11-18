@@ -16,6 +16,11 @@ xcodebuild -project FennFocus.xcodeproj -scheme FennFocus -configuration Release
     -derivedDataPath build/Install -skipMacroValidation -skipPackagePluginValidation -quiet build
 
 target="${INSTALL_DIR:-/Applications}"
+# Without admin rights (common on work Macs) /Applications is read-only – the own Applications folder works too.
+if [ -z "${INSTALL_DIR:-}" ] && [ ! -w "$target" ]; then
+    target="$HOME/Applications"
+    mkdir -p "$target"
+fi
 rm -rf "${target:?}/FennFocus.app"
 ditto build/Install/Build/Products/Release/FennFocus.app "$target/FennFocus.app"
 echo "Installed to $target/FennFocus.app"
