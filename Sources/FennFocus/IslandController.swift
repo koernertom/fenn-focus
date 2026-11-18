@@ -56,10 +56,20 @@ final class IslandController: NSObject, NSWindowDelegate {
         defer: false
     )
     private var hotKeys: [HotKey] = []
+    /// All focus minutes when the current block began – to notice a milestone (10 h, 25 h …) being passed.
+    private var focusTotalBefore = TaskStore.shared.sessions.reduce(0) { $0 + $1.minutes }
     private var placement: IslandPlacement
     /// Where the person dragged the pill to (centre, as a fraction of the visible screen); nil = centred on its edge.
     private var pillCenter: CGPoint? = IslandController.storedPillCenter
     private var pillDrag: (mouse: NSPoint, origin: NSPoint)?
+    /// The open island being dragged by its handle.
+    private var panelDrag: (mouse: NSPoint, origin: NSPoint)?
+    /// Top centre of the pill in `.free` placement (screen points); nil = middle under the menu bar.
+    private var freeTop: NSPoint? = IslandController.storedFreeTop
+    private static let freeTopKey = "fenn.free.top"
+    /// Upward scroll collected over the island's top strip – enough of it folds the island back.
+    private var swipeUp: CGFloat = 0
+    private var lastSwipe = Date.distantPast
     private static let pillCenterKey = "fenn.pill.center"
     private var observers: Set<AnyCancellable> = []
     /// The same modules in a normal, resizable window that can go full screen.
@@ -173,10 +183,12 @@ final class IslandController: NSObject, NSWindowDelegate {
         }
         TaskStore.shared.onTaskCompleted = { [weak self] in
             self?.metrics.logTaskDone()
-            Celebration.shared.fire()
         }
+        // Fenn is glad about every tick: hopping in the open island, in the notch while it's closed.
         TaskStore.shared.onTaskDone = { [weak self] task in
-            self?.notify(IslandNotice(symbol: "checkmark", art: "Page-tasks", title: task.title, detail: tr("Aufgabe erledigt", "Task done"), module: .tasks),
+            let line = FennCheerLine.taskDone()
+            Celebration.shared.cheer(line)
+            self?.notify(IslandNotice(symbol: "checkmark", art: "Page-tasks", title: task.title, detail: line, module: .tasks, cheer: true),
                          peek: tr("Erledigt!", "Done!"))
         }
         // Tasks live in the Fenn Focus folder (tasks/).
@@ -188,9 +200,9 @@ final class IslandController: NSObject, NSWindowDelegate {
         habits.onHabitDone = { [weak self] habit in
             guard let self else { return }
             self.metrics.logHabitDone()
-            Celebration.shared.fire()
+            Celebration.shared.cheer(tr("Routine geschafft – stark!", "Routine done – nice!"))
             self.notify(IslandNotice(symbol: "checkmark.seal.fill", art: ClayArt.name(for: habit.symbol ?? "") ?? "Page-habits",
-                                     title: habit.title, detail: tr("Routine geschafft", "Routine done"), module: .habits),
+                                     title: habit.title, detail: tr("Routine geschafft", "Routine done"), module: .habits, cheer: true),
                         peek: tr("Stark!", "Nice!"))
         }
         habits.autoCheck = { [weak self] auto, date in
@@ -215,11 +227,15 @@ final class IslandController: NSObject, NSWindowDelegate {
                 guard let self else { return }
                 let minutes = max(1, Int((self.focus.remaining / 60).rounded()))
                 if change.0 == .focus, change.1 == .shortBreak || change.1 == .longBreak {
-                    self.notify(IslandNotice(symbol: "cup.and.saucer.fill", art: "Page-focus", title: tr("Fokusblock geschafft", "Focus block done"),
-                                             detail: tr("Steh kurz auf, trink was.", "Stand up, have a drink."), trailing: "\(minutes) min",
-                                             module: .focus, duration: 5),
-                                peek: tr("Pause!", "Break!"))
-                } else if change.0 == .shortBreak || change.0 == .longBreak, change.1 == .focus {
+                    let line = FennCheerLine.focusBlockDone(totalBefore: self.focusTotalBefore)
+                    Celebration.shared.cheer(line)
+                    self.notify(IslandNotice(symbol: "cup.and.saucer.fill", art: "Page-focus", title: line,
+                                             detail: tr("Pause – steh kurz auf, trink was.", "Break – stand up, have a drink."), trailing: "\(minutes) min",
+                                             module: .focus, duration: 5, cheer: true),
+                                peek: tr("Geschafft!", "Done!"))
+                }
+                if change.1 == .focus { self.focusTotalBefore = TaskStore.shared.sessions.reduce(0) { $0 + $1.minutes } }
+                if change.0 == .shortBreak || change.0 == .longBreak, change.1 == .focus {
                     self.notify(IslandNotice(symbol: "hourglass", art: "Page-focus", title: tr("Pause vorbei", "Break's over"),
                                              detail: tr("Nächster Fokusblock läuft.", "Next focus block is on."), trailing: "\(minutes) min",
                                              module: .focus))
@@ -287,6 +303,18 @@ final class IslandController: NSObject, NSWindowDelegate {
                 self.layout(expanded: true)
             }
             .store(in: &observers)
+
+        // Opened by accident? A swipe up over the pill or the island's header folds it back, like pushing it into the notch.
+        NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
+            guard let self, event.window === self.panel, self.model.isExpanded else { return event }
+            self.foldOnSwipe(event)
+            return event
+        }
+        // A click somewhere else closes an island that only the mouse opened.
+        NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
+            guard let self, self.openedByHover, self.model.isExpanded else { return }
+            self.collapse()
+        }
 
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard event.keyCode == UInt16(kVK_Escape), let self, self.model.isExpanded else { return event }
@@ -434,6 +462,7 @@ final class IslandController: NSObject, NSWindowDelegate {
         case "coach", "agent": module = .coach
         case "notes": module = .notes
         case "journal": module = .journal
+        case "progress", "stats": module = .progress
         default: module = .today
         }
         model.module = module
@@ -520,7 +549,13 @@ final class IslandController: NSObject, NSWindowDelegate {
         if UserDefaults.standard.bool(forKey: "FennQANoticeDemo") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 notices.post(IslandNotice(symbol: "checkmark", art: "Page-tasks", title: "Angebotsentwurf schicken",
-                                          detail: tr("Aufgabe erledigt", "Task done"), module: .tasks, duration: 8))
+                                          detail: FennCheerLine.taskDone(), module: .tasks, duration: 8, cheer: true))
+            }
+        }
+        // QA: -FennQACheer task|focus lets Fenn cheer in the open island shortly before the snapshot.
+        if let kind = UserDefaults.standard.string(forKey: "FennQACheer") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4.4) {
+                Celebration.shared.cheer(kind == "focus" ? FennCheerLine.focusBlockDone(totalBefore: .max) : FennCheerLine.taskDone())
             }
         }
         #endif
@@ -565,7 +600,7 @@ final class IslandController: NSObject, NSWindowDelegate {
                 self.collapse()
             }
             hoverWork = work
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: work)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: work)
         }
     }
 
@@ -747,6 +782,7 @@ final class IslandController: NSObject, NSWindowDelegate {
             collapse: { [weak self] in inWindow ? self?.window?.performClose(nil) : self?.collapse() },
             setPlacement: { [weak self] in self?.setPlacement($0) },
             movePill: { [weak self] ended in if !inWindow { self?.movePill(ended: ended) } },
+            movePanel: { [weak self] ended in if !inWindow { self?.movePanel(ended: ended) } },
             chooseAudio: { [weak self] in self?.chooseAudio() },
             chooseCloudFolder: { [weak self] in self?.chooseCloudFolder($0) },
             openWindow: { [weak self] in self?.openWindow() },
@@ -859,10 +895,74 @@ final class IslandController: NSObject, NSWindowDelegate {
         if center.y > visible.maxY - 60, abs(center.x - screen.frame.midX) < 160 {
             return setPlacement(.top)
         }
+        // Close to a side it docks there; anywhere else it stays as a small pill right where it was let go.
+        guard center.x < visible.minX + 90 || center.x > visible.maxX - 90 else {
+            return setFree(NSPoint(x: center.x, y: panel.frame.maxY))
+        }
         placement = center.x < visible.midX ? .left : .right
         UserDefaults.standard.set(placement.rawValue, forKey: IslandPlacement.defaultsKey)
         storePillCenter(CGPoint(x: (center.x - visible.minX) / visible.width, y: (center.y - visible.minY) / visible.height))
         layout(expanded: false)
+    }
+
+    /// Dragging the open island by its handle: the whole window follows the mouse. Dropped at the top centre it goes back
+    /// to the notch; anywhere else it stays there, the pill on top and the island below.
+    private func movePanel(ended: Bool) {
+        guard model.isExpanded, let screen = NSScreen.screens.first else { return }
+        let mouse = NSEvent.mouseLocation
+        if !ended {
+            if panelDrag == nil {
+                panelDrag = (mouse, panel.frame.origin)
+                // Moving it is a decision: it stays open when the mouse leaves.
+                openedByHover = false
+                hoverWork?.cancel()
+            }
+            guard let drag = panelDrag else { return }
+            panel.setFrameOrigin(NSPoint(x: (drag.origin.x + mouse.x - drag.mouse.x).rounded(), y: (drag.origin.y + mouse.y - drag.mouse.y).rounded()))
+            return
+        }
+        guard panelDrag != nil else { return }
+        panelDrag = nil
+        let frame = panel.frame
+        // On an edge the window has room for the shadow above the island; at the top and in free mode the pill is the top.
+        let top = NSPoint(x: frame.midX, y: model.geometry.isVertical ? frame.maxY - IslandGeometry.shadowMargin : frame.maxY)
+        if top.y > screen.visibleFrame.maxY - 30, abs(top.x - screen.frame.midX) < 200 {
+            return setPlacement(.top)
+        }
+        setFree(top)
+    }
+
+    private func setFree(_ top: NSPoint) {
+        placement = .free
+        UserDefaults.standard.set(IslandPlacement.free.rawValue, forKey: IslandPlacement.defaultsKey)
+        freeTop = top
+        UserDefaults.standard.set([Double(top.x), Double(top.y)], forKey: Self.freeTopKey)
+        layout(expanded: model.isExpanded)
+    }
+
+    private static var storedFreeTop: NSPoint? {
+        guard let values = UserDefaults.standard.array(forKey: freeTopKey) as? [Double], values.count == 2 else { return nil }
+        return NSPoint(x: values[0], y: values[1])
+    }
+
+    /// Upward scrolling over the top strip (the pill and the island's header) folds the island back.
+    /// Further down nothing changes – there it scrolls the page as always.
+    private func foldOnSwipe(_ event: NSEvent) {
+        guard event.momentumPhase == [] else { return }
+        let now = Date()
+        if event.phase == .began || now.timeIntervalSince(lastSwipe) > 0.4 { swipeUp = 0 }
+        lastSwipe = now
+        let geometry = model.geometry
+        let strip = (geometry.isVertical ? IslandGeometry.shadowMargin : geometry.collapsedSize.height + IslandGeometry.gap) + 72
+        guard panel.frame.height - event.locationInWindow.y < strip else { return }
+        // Fingers (or the wheel) going up, whatever the scroll direction setting is.
+        var up = event.isDirectionInvertedFromDevice ? -event.scrollingDeltaY : event.scrollingDeltaY
+        if !event.hasPreciseScrollingDeltas { up *= 10 }
+        swipeUp = max(0, swipeUp + up)
+        if swipeUp > 28 {
+            swipeUp = 0
+            collapse()
+        }
     }
 
     private func storePillCenter(_ point: CGPoint?) {
@@ -892,6 +992,11 @@ final class IslandController: NSObject, NSWindowDelegate {
         let visible = screen.visibleFrame
         let origin: NSPoint
         switch placement {
+        case .free:
+            // The pill's top centre where it was dropped; the island hangs below it, kept on the screen.
+            let top = freeTop ?? NSPoint(x: screen.frame.midX, y: visible.maxY - 8)
+            origin = NSPoint(x: min(max(top.x - size.width / 2, visible.minX), visible.maxX - size.width),
+                             y: min(max(top.y - size.height, visible.minY), visible.maxY - size.height))
         case .top:
             let centerX: CGFloat
             if geometry.hasNotch, let left = screen.auxiliaryTopLeftArea {

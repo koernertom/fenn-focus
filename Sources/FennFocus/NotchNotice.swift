@@ -15,6 +15,8 @@ struct IslandNotice: Identifiable, Equatable {
     /// Clicking the notice opens this module.
     var module: IslandModule? = nil
     var duration: Double = 4.2
+    /// Something got done: Fenn hops in place of the picture.
+    var cheer = false
 }
 
 /// Dynamic-Island-style notices on the Mac: the black notch grows sideways and down, says its line and shrinks back
@@ -181,7 +183,9 @@ private struct NotchNoticeView: View {
     private func row(_ notice: IslandNotice) -> some View {
         HStack(spacing: 12) {
             Group {
-                if let art = notice.art {
+                if notice.cheer {
+                    CheeringPebble(size: 34)
+                } else if let art = notice.art {
                     Image(art).resizable().interpolation(.high).scaledToFit()
                 } else {
                     Image(systemName: notice.symbol)
@@ -223,7 +227,7 @@ extension NotchNotices {
     /// QA: the notice drawn open, without a window (-FennQANotice <file.png>).
     static func qaStrip(barHeight: CGFloat) -> some View {
         let store = NotchNotices()
-        store.current = IslandNotice(symbol: "checkmark", art: "Page-tasks", title: "Angebotsentwurf schicken", detail: "Aufgabe erledigt", trailing: "5 min")
+        store.current = IslandNotice(symbol: "checkmark", art: "Page-tasks", title: "Angebotsentwurf schicken", detail: "Abgehakt! Schon 3 heute.", trailing: "5 min", cheer: true)
         store.open = true
         return NotchNoticeView(store: store, closed: CGSize(width: 190, height: barHeight), barHeight: barHeight, notch: true)
             .frame(width: openWidth + 40, height: barHeight + rowHeight + 24)

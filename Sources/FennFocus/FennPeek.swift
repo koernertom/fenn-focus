@@ -95,7 +95,10 @@ private struct PeekView: View {
             let t = context.date.timeIntervalSince(start)
             let reduce = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
             VStack(spacing: 4) {
-                PebbleMac(size: 70)
+                ZStack {
+                    PebbleMac(size: 70)
+                    PebbleFace(mood: .happy, blush: true).frame(width: 70, height: 70)
+                }
                     .rotationEffect(.degrees(reduce ? 0 : wave(t)), anchor: .bottom)
                     .offset(y: reduce ? 0 : drop(t))
                 Text(line)

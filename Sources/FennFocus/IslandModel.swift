@@ -9,6 +9,7 @@ enum IslandModule: String, CaseIterable, Identifiable {
     case coach
     case ideas
     case journal
+    case progress
     case connectors
 
     var id: String { rawValue }
@@ -23,6 +24,7 @@ enum IslandModule: String, CaseIterable, Identifiable {
         case .focus: return tr("Fokus", "Focus")
         case .ideas: return tr("Ideen", "Ideas")
         case .journal: return "Journal"
+        case .progress: return tr("Fortschritt", "Progress")
         case .connectors: return tr("Verbindungen", "Connections")
         }
     }
@@ -37,16 +39,18 @@ enum IslandModule: String, CaseIterable, Identifiable {
         case .focus: return "timer"
         case .ideas: return "lightbulb"
         case .journal: return "book.closed"
+        case .progress: return "chart.bar.xaxis"
         case .connectors: return "powerplug"
         }
     }
 }
 
-/// Where Fenn lives: at the notch / under the menu bar, or docked to a screen edge.
+/// Where Fenn lives: at the notch / under the menu bar, docked to a screen edge, or anywhere it was dragged to.
 enum IslandPlacement: String, CaseIterable, Identifiable {
     case top
     case left
     case right
+    case free
 
     var id: String { rawValue }
 
@@ -55,6 +59,7 @@ enum IslandPlacement: String, CaseIterable, Identifiable {
         case .top: return tr("Oben (Notch)", "Top (notch)")
         case .left: return tr("Links am Rand", "Left edge")
         case .right: return tr("Rechts am Rand", "Right edge")
+        case .free: return tr("Frei verschiebbar", "Anywhere")
         }
     }
 
@@ -80,12 +85,13 @@ struct IslandGeometry: Equatable {
     var pillScale: CGFloat = 1
 
     var usesNotch: Bool { placement == .top && hasNotch }
-    var isVertical: Bool { placement != .top }
+    var isVertical: Bool { placement == .left || placement == .right }
 
     var collapsedSize: CGSize {
         switch placement {
         case .left, .right: return CGSize(width: (Self.edgePillSize.width * pillScale).rounded(), height: (Self.edgePillSize.height * pillScale).rounded())
         case .top: return hasNotch ? CGSize(width: notchWidth + 2 * Self.sideWidth, height: barHeight) : CGSize(width: 210, height: 34)
+        case .free: return CGSize(width: 210, height: 34)
         }
     }
 

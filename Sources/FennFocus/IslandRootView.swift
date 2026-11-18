@@ -7,6 +7,8 @@ struct IslandActions {
     var setPlacement: (IslandPlacement) -> Void
     /// Drag the collapsed pill around (false while moving, true on release).
     var movePill: (Bool) -> Void = { _ in }
+    /// Drag the open island by its handle (false while moving, true on release).
+    var movePanel: (Bool) -> Void = { _ in }
     var chooseAudio: () -> Void
     var chooseCloudFolder: (SyncProvider) -> Void
     var openWindow: () -> Void
@@ -27,7 +29,7 @@ struct IslandRootView: View {
         let geometry = model.geometry
         Group {
             switch geometry.placement {
-            case .top:
+            case .top, .free:
                 VStack(spacing: IslandGeometry.gap) {
                     bar
                     if model.isExpanded { panel(anchor: .top) }
@@ -265,6 +267,7 @@ struct PanelCard: View {
     @FocusState private var composerFocused: Bool
     @State private var draft = ""
     @State private var dragStart: CGSize?
+    @State private var handleHover = false
     @State private var showDesign = FennDemo.isOn && UserDefaults.standard.bool(forKey: "FennQADesign")
 
     var body: some View {
@@ -296,6 +299,10 @@ struct PanelCard: View {
             if !inWindow && !model.launcher { resizeGrip }
         }
         .overlay { ConfettiOverlay().clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous)) }
+        .overlay { FennCheerOverlay().clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous)) }
+        .overlay(alignment: .top) {
+            if !inWindow && !model.needsOnboarding { moveHandle }
+        }
         .overlay {
             if !model.needsOnboarding, intro.isRunning {
                 MacIntroOverlay(intro: intro)
@@ -365,6 +372,8 @@ struct PanelCard: View {
                     IdeasModuleView(store: IdeaStore.shared, selected: $model.openIdea)
                 case .journal:
                     JournalModuleView()
+                case .progress:
+                    ProgressModuleView(store: TaskStore.shared, metrics: services.metrics) { model.module = $0 }
                 case .connectors:
                     ConnectorsModuleView(cloud: FennCloudFolder.shared, ai: ai, connectCloud: actions.chooseCloudFolder)
                 }
@@ -378,7 +387,7 @@ struct PanelCard: View {
     }
 
     /// The person's order (drag and drop in the header): the first `mainCount` are always visible, the rest sit behind "…".
-    private static let orderable: [IslandModule] = [.today, .tasks, .habits, .focus, .ideas, .notes, .journal, .connectors]
+    private static let orderable: [IslandModule] = [.today, .tasks, .habits, .focus, .progress, .ideas, .notes, .journal, .connectors]
 
     /// Modules added in an update land at their default place, not at the end.
     private var moduleOrder: [IslandModule] {
@@ -598,9 +607,31 @@ struct PanelCard: View {
         }
     }
 
+    /// The little bar at the top edge: drag it to put Fenn anywhere on the screen, double-click to send it back to the notch.
+    private var moveHandle: some View {
+        Capsule()
+            .fill(Fenn.fg.opacity(handleHover ? 0.4 : 0.18))
+            .frame(width: 38, height: 5)
+            .frame(width: 90, height: 16)
+            .contentShape(Rectangle())
+            .onHover { inside in
+                withAnimation(.easeOut(duration: 0.12)) { handleHover = inside }
+                (inside ? NSCursor.openHand : NSCursor.arrow).set()
+            }
+            .gesture(
+                DragGesture(minimumDistance: 2, coordinateSpace: .global)
+                    .onChanged { _ in actions.movePanel(false) }
+                    .onEnded { _ in actions.movePanel(true) }
+            )
+            .onTapGesture(count: 2) { actions.setPlacement(.top) }
+            .padding(.top, 2)
+            .help(tr("Ziehen, um Fenn zu verschieben. Doppelklick: zurück an die Notch", "Drag to move Fenn. Double-click: back to the notch"))
+            .accessibilityLabel(tr("Verschieben", "Move"))
+    }
+
     private var collapseSymbol: String {
         switch model.geometry.placement {
-        case .top: return "chevron.up"
+        case .top, .free: return "chevron.up"
         case .left: return "chevron.left"
         case .right: return "chevron.right"
         }

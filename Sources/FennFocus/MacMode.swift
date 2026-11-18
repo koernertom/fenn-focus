@@ -41,7 +41,7 @@ struct MacMode: Codable, Identifiable, Hashable {
     static let listKey = "fenn.mac.modes"
     private static let ownKey = "fenn.mac.mode.ownOrder"
     /// Every module that can sit in the bar, in the default order.
-    static let orderable: [IslandModule] = [.today, .tasks, .habits, .focus, .ideas, .notes, .journal, .connectors]
+    static let orderable: [IslandModule] = [.today, .tasks, .habits, .focus, .progress, .ideas, .notes, .journal, .connectors]
     /// Clay pictures to choose from for a mode.
     static let artChoices = ["Page-focus", "Page-tasks", "Page-ideas", "Page-notes", "Page-journal",
                              "Page-habits", "Clay-sun", "Clay-moon", "Clay-campfire", "Clay-books", "Clay-wave",
@@ -52,7 +52,7 @@ struct MacMode: Codable, Identifiable, Hashable {
     static let builtIn: [MacMode] = [
         own,
         MacMode(id: "work", title: tr("Fokus", "Focus"), art: "Page-focus",
-                moduleIds: ["today", "tasks", "focus", "notes", "ideas"], blocksSocial: true),
+                moduleIds: ["today", "tasks", "focus", "progress", "notes", "ideas"], blocksSocial: true),
         MacMode(id: "free", title: tr("Freizeit", "Free time"), art: "Clay-campfire",
                 moduleIds: ["today", "habits", "journal", "ideas", "notes"]),
         MacMode(id: "recover", title: tr("Erholung", "Recovery"), art: "Clay-moon", moduleIds: ["today", "habits", "journal", "notes"]),

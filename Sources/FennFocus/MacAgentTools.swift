@@ -7,7 +7,7 @@ enum MacAgentTools {
     static func make(_ c: IslandController) -> [AgentTool] {
         let sections: [String: IslandModule] = [
             "heute": .today, "aufgaben": .tasks, "fokus": .focus, "fenn": .coach, "notizen": .notes, "journal": .journal,
-            "ideen": .ideas, "verbindungen": .connectors, "routinen": .habits,
+            "ideen": .ideas, "verbindungen": .connectors, "routinen": .habits, "fortschritt": .progress, "statistik": .progress,
         ]
         return SharedAgentTools.tasks + SharedAgentTools.habits + [
             AgentTool("today_overview", "Holt den Überblick über heute: Termine, Fokuszeit, fällige Aufgaben, Routinen.") { _ in

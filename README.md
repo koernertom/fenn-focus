@@ -19,7 +19,7 @@ subscription.
 **[Website](https://koernertom.github.io/fenn-focus/)** · [Why Fenn](#why-fenn) · [Features](#features) ·
 [How Fenn works](#how-fenn-works) · [Install](#install) · [Models](docs/MODELS.md) · [FAQ](#faq)
 
-<img src="docs/screenshot.png" alt="Three Fenn Focus views: today's tasks, the focus timer hanging from the MacBook notch, and routines with an 8-week view" width="100%">
+<img src="docs/screenshot.png" alt="Three Fenn Focus views: today's tasks, the focus timer hanging from the MacBook notch, and the progress view with total focus hours, tasks done, Pomodoros and streak" width="100%">
 
 </div>
 
@@ -47,14 +47,18 @@ It runs on your Mac, keeps your data in your own folder, and the AI stays on the
   hours and best focus time, what to help with, your main goal, what distracts you and how Fenn should talk to you.
   Every answer is saved the moment you give it (you can stop and continue later) and ends up in `profile/profile.md`,
   which Fenn reads with every request. Change it any time under Connections › About you.
-- **Notch island:** the next meeting, the running focus block and today's tasks at a glance. Opens with ⌃⌥F, or
-  docks under the menu bar / at a screen edge on Macs without a notch.
+- **Notch island:** the next meeting, the running focus block and today's tasks at a glance. Opens with ⌃⌥F or a
+  hover; a swipe up or a click elsewhere folds it back. Drag it by the handle anywhere on the screen, or dock it at a
+  screen edge (double-click the handle to send it back to the notch).
 - **Today:** focus time, routines, your calendar as a timeline and the tasks that matter now.
 - **Tasks:** topics, priority, due dates and estimates; as a list, a day timeline or a review of where the time went.
   Tasks with a date can appear in their own Apple Calendar ("Fenn Focus").
 - **Focus:** Pomodoro timer with presets, focus music (Spotify or your own tracks) and an app blocker for distracting
   apps (a whole browser too, if you pick one) during a block.
 - **Routines:** small habits stacked onto things you already do, with a two-minute version and an 8-week view.
+- **Progress:** total focus hours with the next milestone, tasks done, Pomodoros and your streak, focus per day,
+  week or month, a 20-week heatmap, where the time went and your best time of day. Fenn hops for joy when a
+  Pomodoro or a task is done.
 - **Notes, ideas and journal:** typed or dictated (on-device speech recognition); the AI turns a note into a title,
   summary and to-dos.
 - **Fenn, the AI agent:** "remind me about the offer tomorrow and start 25 minutes on the pitch deck" → Fenn creates

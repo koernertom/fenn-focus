@@ -77,6 +77,7 @@ extension IslandModule {
         case .focus: name = "Page-focus"
         case .ideas: name = "Page-ideas"
         case .journal: name = "Page-journal"
+        case .progress: name = "Page-progress"
         case .connectors: name = "Set-link"
         }
         return name.flatMap { NSImage(named: $0) != nil ? FennArt.pick($0) : nil }

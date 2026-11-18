@@ -5,6 +5,18 @@ import SwiftUI
 final class Celebration: ObservableObject {
     static let shared = Celebration()
     @Published private(set) var burst: (id: UUID, at: Date)?
+    /// Fenn hopping in the island's corner with a line – shown for a moment, see `FennCheerOverlay`.
+    @Published private(set) var cheer: (id: UUID, line: String)?
+
+    /// Confetti plus Fenn jumping for joy with a line.
+    func cheer(_ line: String) {
+        let id = UUID()
+        cheer = (id, line)
+        fire()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) { [weak self] in
+            if self?.cheer?.id == id { self?.cheer = nil }
+        }
+    }
 
     func fire() {
         guard !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else { return }
