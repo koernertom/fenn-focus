@@ -26,7 +26,7 @@ final class FennMCPServer: ObservableObject {
     static let port: UInt16 = 43211
     static var endpoint: String { "http://127.0.0.1:\(port)/mcp" }
     /// Tools that only look; everything else changes something and needs "Lesen und ändern".
-    static let readTools: Set<String> = ["day_schedule", "list_habits", "list_ideas", "list_tasks", "today_overview"]
+    static let readTools: Set<String> = ["day_schedule", "list_habits", "list_goals", "list_ideas", "list_tasks", "today_overview"]
 
     @Published var enabled: Bool { didSet { UserDefaults.standard.set(enabled, forKey: "fenn.mcp.enabled"); enabled ? start() : stop() } }
     @Published var access: Access { didSet { UserDefaults.standard.set(access.rawValue, forKey: "fenn.mcp.access") } }

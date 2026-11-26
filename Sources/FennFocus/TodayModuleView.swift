@@ -315,14 +315,16 @@ struct WorkTodayCard: View {
     let openTasks: () -> Void
 
     var body: some View {
-        let next = store.next(3)
+        let main = store.mainTask(on: FennVault.dayKey(Date()))
+        // The day's main task first, then what's next – three rows at most.
+        let next = Array(((main.map { [$0] } ?? []) + store.next(4).filter { $0.id != main?.id }).prefix(3))
         let focusMinutes = store.focusMinutes(in: .today)
         let due = store.open.filter { $0.isOverdue || $0.isDueToday }.count
         VStack(alignment: .leading, spacing: 10) {
             Button(action: openTasks) {
                 HStack(spacing: 14) {
-                    Text(tr("ARBEIT HEUTE", "WORK TODAY"))
-                        .font(.fenn(size: 11, weight: .medium)).tracking(1.2).foregroundStyle(Fenn.fg.opacity(0.55))
+                    Text(tr("Arbeit heute", "Work today"))
+                        .font(.fenn(size: 13, weight: .semibold)).foregroundStyle(Fenn.fg.opacity(0.6))
                     Spacer()
                     figure("timer", focusMinutes == 0 ? "0" : String(format: "%d:%02d", focusMinutes / 60, focusMinutes % 60), tr("Fokus", "Focus"))
                     figure("checkmark", "\(store.doneCount(in: .today))", tr("Erledigt", "Done"))
@@ -354,10 +356,26 @@ struct WorkTodayCard: View {
                 }
                 .padding(.horizontal, -12)
             }
+            if let line = goalsLine {
+                Text(line).font(.fenn(size: 11.5)).foregroundStyle(Fenn.fg.opacity(0.55)).lineLimit(1)
+                    .help(tr("Fokusstunden in deine Ziele", "Focus hours into your goals"))
+            }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .fennGlass(cornerRadius: 22, shadow: false)
+    }
+
+    /// "Ziele heute 1,7 h · Nordlicht-Pitch 3,7/8 h · Website-Relaunch 3,1/6 h"
+    private var goalsLine: String? {
+        let goals = store.activeGoals
+        guard !goals.isEmpty else { return nil }
+        let today = goals.reduce(0) { $0 + store.goalMinutes($1.id, in: .today) }
+        let parts = goals.map { goal in
+            let week = GoalPlanner.hours(store.goalMinutes(goal.id, in: .thisWeek))
+            return goal.weeklyMinutes.map { "\(goal.title) \(week)/\(GoalPlanner.hours($0)) h" } ?? "\(goal.title) \(week) h"
+        }
+        return ([tr("Ziele heute \(GoalPlanner.hours(today)) h", "Goals today \(GoalPlanner.hours(today)) h")] + parts).joined(separator: " · ")
     }
 
     private func figure(_ symbol: String, _ value: String, _ title: String) -> some View {

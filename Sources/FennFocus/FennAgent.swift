@@ -340,6 +340,7 @@ final class FennAgent: ObservableObject {
               "minut", "stunde", "hour", "start"],
              ["start_focus", "stop_focus", "set_pomodoro", "block_distractions", "add_block_rule"]),
             (["routine", "gewohnheit", "habit"], ["list_habits", "check_habit", "add_habit"]),
+            (["ziel", "goal", "@"], ["add_goal", "list_goals", "add_tasks", "update_task"]),
             (["idee", "idea", "brainstorm", "einfall"], ["capture_idea", "list_ideas", "brainstorm_idea"]),
             (["modus", "mode", "freizeit", "feierabend", "erholung"], ["switch_mode"]),
             (["merk", "remember", "vergiss", "forget"], ["remember"]),
@@ -599,17 +600,25 @@ enum SharedAgentTools {
                             "priority": AgentTool.string("Priorität", options: ["hoch", "mittel", "niedrig"]),
                             "due": AgentTool.string("Fällig am, JJJJ-MM-TT"),
                             "estimate_minutes": AgentTool.number("Geschätzte Minuten"),
+                            "goal": AgentTool.string("Ziel, zu dem die Aufgabe gehört (Name oder Teil davon), falls genannt"),
                         ],
                         "required": ["title"]]]],
                       required: ["tasks"]) { args in
                 let raw = (args["tasks"] as? [[String: Any]]) ?? (args["title"] != nil ? [args] : [])
                 let parsed = raw.compactMap { item -> FennTask? in
-                    guard let title = (item["title"] as? String)?.trimmingCharacters(in: .whitespaces), !title.isEmpty else { return nil }
+                    guard var title = (item["title"] as? String)?.trimmingCharacters(in: .whitespaces), !title.isEmpty else { return nil }
+                    // "@Ziel" in the title works like in the app's own field.
+                    let tagged = TaskCapture.goal(in: title, goals: TaskStore.shared.goals)
+                    if let tagged {
+                        title = tagged.rest.replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression).trimmingCharacters(in: .whitespaces)
+                    }
+                    guard !title.isEmpty else { return nil }
                     var task = FennTask(title: title)
                     task.topic = (item["topic"] as? String) ?? ""
                     task.priority = TaskPriority(storedName: ((item["priority"] as? String) ?? "mittel").capitalized)
                     task.due = (item["due"] as? String).flatMap(AgentDates.day)
                     task.estimateMinutes = (item["estimate_minutes"] as? NSNumber)?.intValue
+                    task.goalId = (item["goal"] as? String).flatMap(TaskStore.shared.goal(named:))?.id ?? tagged?.goal.id
                     return task
                 }
                 let existing = Set(TaskStore.shared.open.map { $0.title.lowercased() })
@@ -637,6 +646,7 @@ enum SharedAgentTools {
                     line += " (\(task.priority.storedName)"
                     if let due = task.due { line += ", fällig \(AgentDates.key(due))" }
                     if let minutes = task.estimateMinutes { line += ", \(minutes) min" }
+                    if let goal = store.goal(task.goalId) { line += ", Ziel \(goal.title)" }
                     return line + ")"
                 }.joined(separator: "\n"))
             },
@@ -676,7 +686,8 @@ enum SharedAgentTools {
                                    "topic": AgentTool.string("Neuer Tag bzw. Thema"),
                                    "due": AgentTool.string("Neues Datum JJJJ-MM-TT, oder \"keins\" zum Entfernen"),
                                    "time": AgentTool.string("Uhrzeit HH:MM, falls genannt"),
-                                   "estimate_minutes": AgentTool.number("Geschätzte Minuten")],
+                                   "estimate_minutes": AgentTool.number("Geschätzte Minuten"),
+                                   "goal": AgentTool.string("Ziel (Name oder Teil davon), zu dem die Aufgabe gehört, oder \"keins\" zum Lösen")],
                       required: ["task"]) { args in
                 guard case .found(var task) = SharedAgentTools.match(args["task"] as? String, in: TaskStore.shared.tasks) else {
                     return .info(SharedAgentTools.matchProblem(args["task"] as? String))
@@ -692,12 +703,62 @@ enum SharedAgentTools {
                     if parts.count == 2 { task.due = Calendar.current.date(bySettingHour: parts[0], minute: parts[1], second: 0, of: day) }
                 }
                 if let minutes = (args["estimate_minutes"] as? NSNumber)?.intValue { task.estimateMinutes = minutes }
+                if let name = args["goal"] as? String {
+                    if ["keins", "none", "kein", ""].contains(name.lowercased()) {
+                        task.goalId = nil
+                    } else if let goal = TaskStore.shared.goal(named: name) {
+                        task.goalId = goal.id
+                    } else {
+                        return .info("Kein aktives Ziel passt zu „\(name)“. Ziele: " + TaskStore.shared.activeGoals.map(\.title).joined(separator: "; "))
+                    }
+                }
                 TaskStore.shared.update(task)
                 var detail = [task.priority.title]
                 if !task.topic.isEmpty { detail.append("#\(task.topic)") }
                 if let due = task.due { detail.append(TaskFormat.day(due)) }
+                if let goal = TaskStore.shared.goal(task.goalId) { detail.append("@\(goal.title)") }
                 return .done(tr("Geändert: \(task.title), \(detail.joined(separator: ", "))", "Updated: \(task.title), \(detail.joined(separator: ", "))"),
                              symbol: "pencil")
+            },
+            AgentTool("add_goal", "Legt ein Ziel an – etwas Größeres, auf das Aufgaben einzahlen (Halbmarathon, Abschlussarbeit, Launch). Mit Grund, Deadline und Stunden pro Woche, wenn genannt. Nicht für einzelne Aufgaben.",
+                      properties: ["title": AgentTool.string("Kurzer Name des Ziels"),
+                                   "why": AgentTool.string("Warum es der Person wichtig ist, ein Satz"),
+                                   "deadline": AgentTool.string("Bis wann, JJJJ-MM-TT"),
+                                   "weekly_hours": AgentTool.number("Stunden pro Woche, die sie hineinstecken will")],
+                      required: ["title"]) { args in
+                let store = TaskStore.shared
+                store.reload()
+                guard let title = (args["title"] as? String)?.trimmingCharacters(in: .whitespaces), !title.isEmpty else { return .info("Kein Titel.") }
+                if store.activeGoals.contains(where: { $0.title.lowercased() == title.lowercased() }) { return .info("Das Ziel „\(title)“ gibt es schon.") }
+                var goal = FennGoal(title: title)
+                goal.why = (args["why"] as? String).flatMap { $0.trimmingCharacters(in: .whitespaces).isEmpty ? nil : $0 }
+                goal.deadline = (args["deadline"] as? String).flatMap(AgentDates.day)
+                if let hours = (args["weekly_hours"] as? NSNumber)?.doubleValue, hours > 0 { goal.weeklyMinutes = Int((hours * 60).rounded()) }
+                goal.symbol = GoalPlanner.symbol(for: title)
+                store.addGoal(goal)
+                var detail: [String] = []
+                if let deadline = goal.deadline { detail.append(tr("bis \(AgentDates.key(deadline))", "by \(AgentDates.key(deadline))")) }
+                if let minutes = goal.weeklyMinutes { detail.append(tr("\(TaskFormat.duration(minutes)) pro Woche", "\(TaskFormat.duration(minutes)) a week")) }
+                return .done(tr("Ziel angelegt: \(title)", "Goal added: \(title)") + (detail.isEmpty ? "" : ", " + detail.joined(separator: ", ")),
+                             symbol: "flag.checkered")
+            },
+            AgentTool("list_goals", "Zeigt die aktiven Ziele mit Deadline, Stunden diese Woche gegen das Wochenziel, erledigten Schritten und dem nächsten Schritt.",
+                      properties: [:]) { _ in
+                let store = TaskStore.shared
+                store.reload()
+                let goals = store.activeGoals
+                if goals.isEmpty { return .info("Keine aktiven Ziele.") }
+                return .info(goals.map { goal in
+                    let steps = store.tasks(of: goal.id)
+                    var line = "- \(goal.title)"
+                    if let why = goal.why, !why.isEmpty { line += " (\(why))" }
+                    if let deadline = goal.deadline { line += ", bis \(AgentDates.key(deadline))" }
+                    line += ", diese Woche \(store.goalMinutes(goal.id, in: .thisWeek)) min"
+                    if let target = goal.weeklyMinutes { line += " von \(target) min" }
+                    line += ", \(steps.filter(\.done).count)/\(steps.count) Schritte erledigt"
+                    if let next = store.nextStep(of: goal.id) { line += ", nächster Schritt: \(next.title)" }
+                    return line
+                }.joined(separator: "\n"))
             },
             AgentTool("delete_task", "Löscht eine Aufgabe endgültig – nur wenn die Person das ausdrücklich will (sonst complete_task).",
                       properties: ["task": AgentTool.string("Titel der Aufgabe oder ein eindeutiger Teil davon")], required: ["task"],

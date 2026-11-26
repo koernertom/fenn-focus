@@ -514,6 +514,7 @@ struct TaskKindCard: View {
     @ObservedObject private var store = TaskStore.shared
     @State private var aiGuesses: Set<UUID> = TaskKindCard.cache ?? []
     @State private var showsBlockers = false
+    @State private var showsGuesses = false
     @State private var dismissedTick = 0
     @MainActor private static var cache: Set<UUID>?
 
@@ -536,13 +537,30 @@ struct TaskKindCard: View {
         }
     }
 
+    /// One quiet line; the guesses unfold under it.
     private func suggestion(_ guesses: [FennTask]) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(tr("Termine statt Aufgaben?", "Appointments, not tasks?")).font(.fenn(size: 14, weight: .semibold)).foregroundStyle(Fenn.fg)
-            Text(tr("Als Termin blocken sie nur Zeit und stehen nicht mehr bei den offenen Aufgaben.",
-                    "As appointments they just block time and leave the open tasks."))
-                .font(.fenn(size: 12)).foregroundStyle(Fenn.fg.opacity(0.6))
-                .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: 6) {
+            Button { withAnimation(.snappy) { showsGuesses.toggle() } } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "chevron.right").font(.fenn(size: 10, weight: .semibold)).rotationEffect(.degrees(showsGuesses ? 90 : 0))
+                    Text(guesses.count == 1 ? tr("1 Eintrag sieht aus wie ein Termin", "1 entry looks like an appointment")
+                                            : tr("\(guesses.count) Einträge sehen aus wie Termine", "\(guesses.count) entries look like appointments"))
+                        .font(.fenn(size: 12))
+                    Spacer(minLength: 0)
+                }
+                .foregroundStyle(Fenn.fg.opacity(0.55))
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help(tr("Als Termin blocken sie nur Zeit und stehen nicht mehr bei den offenen Aufgaben.",
+                     "As appointments they just block time and leave the open tasks."))
+            if showsGuesses { guessList(guesses) }
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private func guessList(_ guesses: [FennTask]) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
             ForEach(guesses) { task in
                 HStack(spacing: 8) {
                     Image(systemName: "calendar").font(.fenn(size: 12)).foregroundStyle(Fenn.accent)
@@ -559,11 +577,12 @@ struct TaskKindCard: View {
             }
             if guesses.count > 1 {
                 Button(tr("Alle als Termine führen", "Keep all as appointments")) { guesses.forEach { store.setBlocker($0.id, true) } }
-                    .buttonStyle(FennPillButtonStyle())
+                    .buttonStyle(.plain).font(.fenn(size: 12, weight: .medium)).foregroundStyle(Fenn.accent)
+                    .padding(.top, 2)
             }
         }
-        .padding(14)
-        .background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Fenn.fill))
+        .padding(.horizontal, 12).padding(.vertical, 6)
+        .fennGlass(cornerRadius: 16, shadow: false)
     }
 
     private var blockerList: some View {

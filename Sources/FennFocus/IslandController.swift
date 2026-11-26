@@ -318,6 +318,8 @@ final class IslandController: NSObject, NSWindowDelegate {
 
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard event.keyCode == UInt16(kVK_Escape), let self, self.model.isExpanded else { return event }
+            // The task focus view and the command palette close themselves on Esc; the island stays open.
+            if self.model.module == .tasks, TasksNav.shared.takesEscape { return event }
             self.collapse()
             return nil
         }

@@ -53,6 +53,13 @@ It runs on your Mac, keeps your data in your own folder, and the AI stays on the
 - **Today:** focus time, routines, your calendar as a timeline and the tasks that matter now.
 - **Tasks:** topics, priority, due dates and estimates; as a list, a day timeline or a review of where the time went.
   Tasks with a date can appear in their own Apple Calendar ("Fenn Focus").
+- **Goals:** bigger things your tasks lead to, with a why, a deadline and hours per week. Each goal shows the focus
+  hours this week against its target, steps done and the next step; `@goal` attaches a task when you type it.
+  "First today" picks the one task that matters most and can reserve time for it in your day's first free gap.
+- **Week plan:** Monday to Sunday with each day's tasks and how much free time is left; drag tasks between days or
+  back to "Unplanned". Closing the week writes a short check into your journal.
+- **Task focus:** one task fills the panel with the running Pomodoro; tick it off (⌘⏎) and the next one follows in
+  the same Pomodoro. Keys in Tasks: N new task, F focus, L/W/G today, week, goals, ↑/↓ and Space, ⌘K command palette.
 - **Focus:** Pomodoro timer with presets, focus music (Spotify or your own tracks) and an app blocker for distracting
   apps (a whole browser too, if you pick one) during a block.
 - **Routines:** small habits stacked onto things you already do, with a two-minute version and an 8-week view.

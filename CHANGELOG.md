@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.2.0
+
+- **Goals.** A new "Goals" view in Tasks: one card per goal with its symbol, why it matters, the deadline
+  ("12 days left"), a ring with this week's focus hours against the weekly target, steps done and the next step with
+  ▶. Unfold a goal to see all its steps and add one inline. Goals can be edited, marked as reached, archived or
+  deleted (their tasks stay). Task rows show the goal, the task editor has a goal picker, and typing `@goal` in any
+  task capture attaches it. Goals live in `tasks/tasks.json` next to the tasks; older files read as before.
+- **Goal hours.** Today shows the hours that went into goals today and this week; Progress has a "Goals this week"
+  card; the review in Tasks gets a "This week" section per goal (hours, steps done, what slipped).
+- **Week plan.** A "Week" view from Monday to Sunday with a week switcher: each day's tasks, planned time against the
+  free working time from the day planner, an "Unplanned" tray, drag and drop between days, and "+" per day.
+- **First today.** Pick the one task that matters most today; Fenn suggests the next step of the goal that is
+  furthest behind its weekly hours. "Reserve time" gives it today's first free gap that fits its estimate.
+- **Task focus.** ▶ (or F) opens a full-panel view of one task with the running Pomodoro. "Complete" (⌘⏎) ticks it
+  off and the next task follows straight away in the same Pomodoro: the goal's next step, otherwise the next task.
+  The minutes so far stay with the finished task.
+- **Keys in Tasks** (when no text field is being edited): N new task, F focus, L today, W week, G goals, ↑/↓ select, Space
+  tick off, ⌘K a command palette for tasks, goals, areas and actions.
+- **Close the week.** Writes a short "Wochen-Check" into today's journal and opens next week for planning.
+- **Log time.** The task editor can log minutes worked without the timer; they count for the day and the goal.
+- **Agent.** New tools `add_goal` and `list_goals`; `add_tasks` and `update_task` take a `goal` by name.
+- **A calmer Tasks screen** (following Apple's HIG): three views as text segments (Today, Week, Goals, keys L/W/G)
+  and one … menu for the day view, timeline, review, grouping, topic filter and the calendar; rows show the title
+  and one quiet line (goal or topic, date, estimate); no topic chips and no storage line at the bottom; the task
+  editor shows goal, date and estimate first and the rest under "More"; likely appointments fold into one line.
+- Demo mode keeps its own Pomodoro, so screenshots never touch a running real one.
+
 ## 1.1.0
 
 - **Progress.** A new view with your total focus hours and the next milestone (1 h, 5 h, 10 h, 25 h …), focus,

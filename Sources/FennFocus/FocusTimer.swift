@@ -104,6 +104,21 @@ final class FocusTimer: ObservableObject {
         taskTitle = task?.title ?? tr("Fokus", "Focus")
     }
 
+    /// Moves the running Pomodoro on to another task (the next step after one is ticked off):
+    /// the minutes so far stay with the task before, the clock keeps going.
+    func handOver(to task: FennTask?) {
+        if let snapshot, isActive, task?.id != taskId {
+            var now = snapshot
+            if now.phase == "work" || now.phase == "break" { now = PomodoroClock.pause(now, at: Date()) }
+            let minutes = Int(((now.focusedSeconds - loggedFocus) / 60).rounded())
+            if minutes >= 1 {
+                TaskStore.shared.logFocus(minutes: minutes, taskId: taskId, title: taskTitle, start: Date().addingTimeInterval(Double(-minutes * 60)))
+                loggedFocus = now.focusedSeconds
+            }
+        }
+        focus(on: task)
+    }
+
     func start() {
         if isActive, !isRunning, let snapshot {
             adopt(PomodoroClock.resume(snapshot, at: Date()))
@@ -275,7 +290,8 @@ final class FocusTimer: ObservableObject {
     }
 
     private static let settingsKey = "fenn.pomodoro.settings"
-    private static let snapshotKey = "fenn.pomodoro.snapshot"
+    /// Demo mode (screenshots) keeps its own clock, so the real running Pomodoro is never touched.
+    private static var snapshotKey: String { FennDemo.isOn ? "fenn.pomodoro.snapshot.demo" : "fenn.pomodoro.snapshot" }
 
     private static func loadSettings() -> PomodoroSettings {
         guard let data = UserDefaults.standard.data(forKey: settingsKey),

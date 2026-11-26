@@ -41,6 +41,7 @@ struct ProgressModuleView: View {
                 VStack(alignment: .leading, spacing: 14) {
                     hero
                     tiles
+                    goalsCard
                     FennSegments(options: Period.allCases, selection: $period) { $0.title }
                         .frame(maxWidth: .infinity)
                     focusChart
@@ -207,6 +208,44 @@ struct ProgressModuleView: View {
                          delta: blocksDelta?.text, up: blocksDelta?.up)
                 AuraPill(title: tr("Serie", "Streak"), value: "\(metrics.streakDays)", unit: tr("Tage", "days"), palette: .stone,
                          symbol: "flame.fill")
+            }
+        }
+    }
+
+    // MARK: Goals
+
+    /// Hours per goal this week against its weekly target.
+    @ViewBuilder
+    private var goalsCard: some View {
+        let goals = store.activeGoals
+        if !goals.isEmpty {
+            let week = DateInterval.thisWeek
+            let total = goals.reduce(0) { $0 + store.goalMinutes($1.id, in: week) }
+            card(tr("Ziele diese Woche", "Goals this week"), trailing: "\(Self.clock(total)) h") {
+                ForEach(goals) { goal in
+                    let minutes = store.goalMinutes(goal.id, in: week)
+                    HStack(spacing: 10) {
+                        ClaySymbol(symbol: goal.symbol ?? "flag.checkered", size: 22)
+                        VStack(alignment: .leading, spacing: 5) {
+                            HStack {
+                                Text(goal.title).font(.fenn(size: 13, weight: .medium)).foregroundStyle(Fenn.fg).lineLimit(1)
+                                Spacer(minLength: 6)
+                                Text(goal.weeklyMinutes.map { "\(Self.clock(minutes)) / \($0 / 60) h" } ?? "\(Self.clock(minutes)) h")
+                                    .font(.fenn(size: 12, weight: .medium).monospacedDigit())
+                                    .foregroundStyle(Fenn.fg.opacity(0.7))
+                            }
+                            GoalBar(value: goal.weeklyMinutes.map { Double(minutes) / Double(max($0, 1)) } ?? (minutes > 0 ? 1 : 0))
+                        }
+                    }
+                }
+                Button {
+                    UserDefaults.standard.set(TasksModuleView.Mode.goals.rawValue, forKey: TasksModuleView.modeKey)
+                    openModule(.tasks)
+                } label: {
+                    Label(tr("Ziele öffnen", "Open goals"), systemImage: "arrow.right").font(.fenn(size: 12, weight: .medium))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Fenn.accent)
             }
         }
     }

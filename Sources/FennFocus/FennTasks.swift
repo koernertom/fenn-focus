@@ -104,6 +104,10 @@ struct FennTask: Codable, Identifiable, Equatable {
     /// An appointment rather than a to-do (birthday, doctor, a ride): it blocks its time in the day view,
     /// but isn't an open task – not in the home list, never overdue.
     var blocker: Bool?
+    /// The goal this task is a step towards.
+    var goalId: UUID?
+    /// yyyy-MM-dd: the day this is the one thing that matters most.
+    var mainDay: String?
 
     var isStarred: Bool { starred == true }
     var isBlocker: Bool { blocker == true }
@@ -145,6 +149,38 @@ struct FocusSession: Codable, Identifiable, Equatable {
     var title: String
     var topic: String
     var device = TaskStore.device
+    /// The goal the minutes went into (from the task at the time).
+    var goalId: UUID?
+}
+
+/// Something bigger that tasks lead to – a half marathon, a thesis chapter, a launch. Its tasks are the steps,
+/// its focus minutes the hours that went in.
+struct FennGoal: Codable, Identifiable, Equatable {
+    var id = UUID()
+    var title: String
+    /// Why it matters – read on bad days.
+    var why: String?
+    var deadline: Date?
+    /// SF symbol name, shown as clay where there is one.
+    var symbol: String?
+    /// Hours per week the person wants to give it.
+    var weeklyMinutes: Int?
+    var done: Bool?
+    var archivedAt: Date?
+    var created = Date()
+    var updated = Date()
+
+    var isActive: Bool { done != true && archivedAt == nil }
+
+    static let symbols = ["flag.checkered", "figure.run", "book.closed", "briefcase", "graduationcap", "heart",
+                          "lightbulb", "dumbbell", "leaf", "house", "paintpalette", "chart.line.uptrend.xyaxis"]
+
+    /// Whole days until the deadline (negative once it has passed).
+    func daysLeft(from now: Date = Date()) -> Int? {
+        guard let deadline else { return nil }
+        let calendar = Calendar.current
+        return calendar.dateComponents([.day], from: calendar.startOfDay(for: now), to: calendar.startOfDay(for: deadline)).day
+    }
 }
 
 /// What sits in `tasks/tasks.json`. Deleted tasks leave a dated tombstone so a device that still has them doesn't bring them back.
@@ -152,6 +188,25 @@ struct TaskFile: Codable, Equatable {
     var tasks: [FennTask] = []
     var deleted: [String: Date] = [:]
     var sessions: [FocusSession] = []
+    var goals: [FennGoal] = []
+
+    enum CodingKeys: String, CodingKey { case tasks, deleted, sessions, goals }
+
+    init(tasks: [FennTask] = [], deleted: [String: Date] = [:], sessions: [FocusSession] = [], goals: [FennGoal] = []) {
+        self.tasks = tasks
+        self.deleted = deleted
+        self.sessions = sessions
+        self.goals = goals
+    }
+
+    /// Files from before goals existed (and from apps that don't know them yet) read without them.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        tasks = try container.decodeIfPresent([FennTask].self, forKey: .tasks) ?? []
+        deleted = try container.decodeIfPresent([String: Date].self, forKey: .deleted) ?? [:]
+        sessions = try container.decodeIfPresent([FocusSession].self, forKey: .sessions) ?? []
+        goals = try container.decodeIfPresent([FennGoal].self, forKey: .goals) ?? []
+    }
 
     /// Newest version of each task wins.
     static func merge(_ a: TaskFile, _ b: TaskFile) -> TaskFile {
@@ -170,7 +225,11 @@ struct TaskFile: Codable, Equatable {
             .sorted { $0.created < $1.created }
         var sessions: [UUID: FocusSession] = [:]
         for session in a.sessions + b.sessions { sessions[session.id] = session }
-        return TaskFile(tasks: tasks, deleted: deleted, sessions: sessions.values.sorted { $0.start < $1.start })
+        var goals: [UUID: FennGoal] = [:]
+        for goal in a.goals + b.goals where (goals[goal.id]?.updated ?? .distantPast) <= goal.updated { goals[goal.id] = goal }
+        let liveGoals = goals.values.filter { goal in deleted[goal.id.uuidString].map { goal.updated > $0 } ?? true }
+        return TaskFile(tasks: tasks, deleted: deleted, sessions: sessions.values.sorted { $0.start < $1.start },
+                        goals: liveGoals.sorted { $0.created < $1.created })
     }
 }
 
@@ -189,6 +248,7 @@ final class TaskStore: ObservableObject {
 
     @Published private(set) var tasks: [FennTask] = []
     @Published private(set) var sessions: [FocusSession] = []
+    @Published private(set) var goals: [FennGoal] = []
     /// Fires when a task flips to done – counted in the day stats.
     var onTaskCompleted: () -> Void = {}
     /// The same moment with the task itself – for notices that name it.
@@ -209,8 +269,9 @@ final class TaskStore: ObservableObject {
     func reload() {
         if FennDemo.isOn {
             if !loaded {
-                let tasks = TaskDemo.tasks()
-                file = TaskFile(tasks: tasks, sessions: TaskDemo.sessions(tasks))
+                let goals = TaskDemo.goals()
+                let tasks = TaskDemo.link(TaskDemo.tasks(), to: goals)
+                file = TaskFile(tasks: tasks, sessions: TaskDemo.sessions(tasks), goals: goals)
             }
             loaded = true
             publish()
@@ -240,6 +301,7 @@ final class TaskStore: ObservableObject {
     private func publish() {
         tasks = file.tasks
         sessions = file.sessions
+        goals = file.goals
     }
 
     /// Writes locally and into the folder, merging with whatever another device wrote there in the meantime.
@@ -355,13 +417,92 @@ final class TaskStore: ObservableObject {
         ensureLoaded()
         guard minutes > 0 else { return }
         var topic = ""
+        var goal: UUID?
         if let taskId, let index = file.tasks.firstIndex(where: { $0.id == taskId }) {
             file.tasks[index].spentMinutes += minutes
             file.tasks[index].updated = Date()
             topic = file.tasks[index].topic
+            goal = file.tasks[index].goalId
         }
-        file.sessions.append(FocusSession(start: start, minutes: minutes, taskId: taskId, title: title, topic: topic))
+        file.sessions.append(FocusSession(start: start, minutes: minutes, taskId: taskId, title: title, topic: topic, goalId: goal))
         if file.sessions.count > 3000 { file.sessions.removeFirst(file.sessions.count - 3000) }
+        save()
+    }
+
+    // MARK: Goals
+
+    var activeGoals: [FennGoal] { goals.filter(\.isActive) }
+
+    func goal(_ id: UUID?) -> FennGoal? { id.flatMap { id in goals.first { $0.id == id } } }
+
+    /// By (part of) its title, for "@Halbmarathon" and the agent.
+    func goal(named name: String) -> FennGoal? {
+        let query = name.lowercased().trimmingCharacters(in: .whitespaces)
+        guard !query.isEmpty else { return nil }
+        return activeGoals.first { $0.title.lowercased() == query }
+            ?? activeGoals.first { $0.title.lowercased().hasPrefix(query) || $0.title.lowercased().contains(query) }
+    }
+
+    @discardableResult
+    func addGoal(_ goal: FennGoal) -> FennGoal {
+        ensureLoaded()
+        var goal = goal
+        goal.title = goal.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        goal.created = Date()
+        goal.updated = Date()
+        file.goals.append(goal)
+        save()
+        return goal
+    }
+
+    func updateGoal(_ goal: FennGoal) {
+        ensureLoaded()
+        guard let index = file.goals.firstIndex(where: { $0.id == goal.id }), file.goals[index] != goal else { return }
+        var goal = goal
+        goal.updated = Date()
+        file.goals[index] = goal
+        save()
+    }
+
+    /// The goal goes; its tasks stay, without it.
+    func deleteGoal(_ id: UUID) {
+        ensureLoaded()
+        file.goals.removeAll { $0.id == id }
+        file.deleted[id.uuidString] = Date()
+        for index in file.tasks.indices where file.tasks[index].goalId == id {
+            file.tasks[index].goalId = nil
+            file.tasks[index].updated = Date()
+        }
+        save()
+    }
+
+    func tasks(of goal: UUID) -> [FennTask] { tasks.filter { $0.goalId == goal && !$0.isBlocker } }
+
+    /// Focus minutes that went into a goal – by the session's goal, or by its task's for older sessions.
+    func goalMinutes(_ goal: UUID, in range: DateInterval? = nil) -> Int {
+        let taskIds = Set(tasks(of: goal).map(\.id))
+        return sessions.filter { session in
+            (session.goalId == goal || (session.goalId == nil && session.taskId.map(taskIds.contains) == true))
+                && (range.map { $0.contains(session.start) } ?? true)
+        }.reduce(0) { $0 + $1.minutes }
+    }
+
+    /// The next step: the starred or most urgent open task of the goal.
+    func nextStep(of goal: UUID) -> FennTask? { open.first { $0.goalId == goal } }
+
+    /// The one thing for a day (yyyy-MM-dd).
+    func mainTask(on day: String) -> FennTask? { open.first { $0.mainDay == day } }
+
+    func setMain(_ id: UUID?, on day: String) {
+        ensureLoaded()
+        for index in file.tasks.indices where file.tasks[index].mainDay == day && file.tasks[index].id != id {
+            file.tasks[index].mainDay = nil
+            file.tasks[index].updated = Date()
+        }
+        if let id, let index = file.tasks.firstIndex(where: { $0.id == id }) {
+            file.tasks[index].mainDay = day
+            file.tasks[index].updated = Date()
+        }
         save()
     }
 
@@ -625,15 +766,19 @@ enum TaskCapture {
         var note: String?
     }
 
-    static func structure(_ text: String, topics: [String]) async -> Result {
-        await model(text, topics: topics) ?? rules(text, topics: topics)
+    static func structure(_ text: String, topics: [String], goals: [FennGoal] = []) async -> Result {
+        await model(text, topics: topics, goals: goals) ?? rules(text, topics: topics, goals: goals)
     }
 
     /// Only the connected AI model – nil when there is none, it needs consent first, or the reply didn't fit.
-    static func model(_ text: String, topics: [String]) async -> Result? {
-        let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+    static func model(_ text: String, topics: [String], goals: [FennGoal] = []) async -> Result? {
+        var text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        // "@Ziel" is read by rules – the model only sees the rest, every task it makes goes to that goal.
+        let found = goal(in: text, goals: goals)
+        if let found { text = found.rest.trimmingCharacters(in: .whitespaces) }
         guard !text.isEmpty, FennAI.isConfigured, !FennAI.needsConsent(),
               var result = try? await ai(text, topics: topics), !result.tasks.isEmpty || result.note != nil else { return nil }
+        if let found { for index in result.tasks.indices { result.tasks[index].goalId = found.goal.id } }
         // Explicit words beat the model: "bis Freitag", "45 min", "wichtig" are read by rules, which don't miscount weekdays.
         if result.tasks.count == 1 {
             let ruled = parse(text, topics: topics)
@@ -687,8 +832,8 @@ enum TaskCapture {
     }
 
     /// A to-do found in a note, with the note's day ("heute", "morgen") as due date.
-    static func task(from todo: NoteTodo, topics: [String]) -> FennTask {
-        var task = parse(todo.title, topics: topics)
+    static func task(from todo: NoteTodo, topics: [String], goals: [FennGoal] = []) -> FennTask {
+        var task = parse(todo.title, topics: topics, goals: goals)
         if task.title.isEmpty { task.title = todo.title }
         if task.due == nil, let offset = todo.dayOffset {
             task.due = Calendar.current.date(byAdding: .day, value: offset, to: Calendar.current.startOfDay(for: Date()))
@@ -712,15 +857,29 @@ enum TaskCapture {
     ]
 
     /// One task per line (or per ";"); markers are taken out of the title.
-    static func rules(_ text: String, topics: [String]) -> Result {
+    static func rules(_ text: String, topics: [String], goals: [FennGoal] = []) -> Result {
         let lines = text.components(separatedBy: CharacterSet(charactersIn: "\n;"))
             .map { $0.trimmingCharacters(in: CharacterSet(charactersIn: " -•*[]\t")) }
             .filter { !$0.isEmpty }
-        let tasks = lines.map { parse($0, topics: topics) }.filter { !$0.title.isEmpty }
+        let tasks = lines.map { parse($0, topics: topics, goals: goals) }.filter { !$0.title.isEmpty }
         return Result(tasks: tasks)
     }
 
-    static func parse(_ line: String, topics: [String]) -> FennTask {
+    /// "@Halbmarathon" (or the start of a goal's name): the goal it belongs to, and the line without it.
+    static func goal(in line: String, goals: [FennGoal]) -> (goal: FennGoal, rest: String)? {
+        guard let range = line.range(of: #"@[\p{L}0-9_-]+"#, options: .regularExpression) else { return nil }
+        let word = line[range].dropFirst().lowercased()
+        let active = goals.filter(\.isActive)
+        guard let goal = active.first(where: { $0.title.lowercased().replacingOccurrences(of: " ", with: "") == word })
+                ?? active.first(where: { $0.title.lowercased().hasPrefix(word) })
+                ?? active.first(where: { $0.title.lowercased().contains(word) }) else { return nil }
+        return (goal, line.replacingCharacters(in: range, with: " "))
+    }
+
+    static func parse(_ line: String, topics: [String], goals: [FennGoal] = []) -> FennTask {
+        var line = line
+        let found = goal(in: line, goals: goals)
+        if let found { line = found.rest }
         var title = " " + line + " "
         let lower = title.lowercased()
         var task = FennTask(title: "")
@@ -758,6 +917,7 @@ enum TaskCapture {
         }
         clean = clean.trimmingCharacters(in: CharacterSet(charactersIn: " .,:"))
         task.title = clean.prefix(1).uppercased() + clean.dropFirst()
+        task.goalId = found?.goal.id
         return task
     }
 
@@ -809,6 +969,35 @@ enum TaskCapture {
 // MARK: - Demo
 
 enum TaskDemo {
+    /// Three goals for screenshots.
+    static func goals() -> [FennGoal] {
+        let en = tr("de", "en") == "en"
+        let day: (Int) -> Date = { Calendar.current.date(byAdding: .day, value: $0, to: Calendar.current.startOfDay(for: Date()))! }
+        return [
+            FennGoal(title: en ? "Win the Nordlicht pitch" : "Nordlicht-Pitch gewinnen", why: en ? "The biggest client of the year" : "Der größte Kunde des Jahres",
+                     deadline: day(9), symbol: "briefcase", weeklyMinutes: 8 * 60),
+            FennGoal(title: en ? "Website relaunch live" : "Website-Relaunch live", why: en ? "The old site hides our best work" : "Die alte Seite versteckt unsere beste Arbeit",
+                     deadline: day(30), symbol: "flag.checkered", weeklyMinutes: 6 * 60),
+            FennGoal(title: en ? "Half marathon under 2 h" : "Halbmarathon unter 2 h", why: en ? "Proof that I keep at things" : "Beweis, dass ich dranbleibe",
+                     deadline: day(20), symbol: "figure.run", weeklyMinutes: 4 * 60),
+        ]
+    }
+
+    /// Demo tasks to their goals by topic.
+    static func link(_ tasks: [FennTask], to goals: [FennGoal]) -> [FennTask] {
+        tasks.map { task in
+            var task = task
+            switch task.topic {
+            case "Kunde Nordlicht", "Client Nordlicht": task.goalId = goals[0].id
+            case "Website-Relaunch", "Website relaunch": task.goalId = goals[1].id
+            case "Training": task.goalId = goals[2].id
+            default: break
+            }
+            if task.title.hasPrefix("Q4") { task.mainDay = FennVault.dayKey(Date()) }
+            return task
+        }
+    }
+
     static func tasks() -> [FennTask] {
         let day: (Int) -> Date = { Calendar.current.date(byAdding: .day, value: $0, to: Calendar.current.startOfDay(for: Date()))! }
         func task(_ title: String, _ topic: String, _ priority: TaskPriority, start: Int? = nil, due: Int?, estimate: Int?, spent: Int = 0, doneDaysAgo: Int? = nil) -> FennTask {
@@ -831,7 +1020,11 @@ enum TaskDemo {
             task(en ? "1:1 notes" : "1:1-Notizen", en ? "Team" : "Team", .low, due: 0, estimate: 20, spent: 15, doneDaysAgo: 0),
             task(en ? "Invoice September" : "Rechnung September", en ? "Private" : "Privat", .medium, due: -2, estimate: 20, spent: 20, doneDaysAgo: 2),
             task(en ? "Weekly review" : "Wochenrückblick", en ? "Private" : "Privat", .medium, due: 4, estimate: 30),
-            task(en ? "Cancel old phone contract" : "Alten Handyvertrag kündigen", en ? "Private" : "Privat", .low, due: nil, estimate: 20)
+            task(en ? "Cancel old phone contract" : "Alten Handyvertrag kündigen", en ? "Private" : "Privat", .low, due: nil, estimate: 20),
+            task(en ? "Write an 8-week training plan" : "Trainingsplan für 8 Wochen schreiben", "Training", .medium, due: 1, estimate: 45),
+            task(en ? "Test and buy running shoes" : "Laufschuhe testen und kaufen", "Training", .low, due: 3, estimate: 60),
+            task(en ? "Review training week 1" : "Trainingswoche 1 auswerten", "Training", .low, due: -1, estimate: 45, spent: 50, doneDaysAgo: 1),
+            task(en ? "Case studies for the new site" : "Case Studies für die neue Seite", en ? "Website relaunch" : "Website-Relaunch", .medium, due: nil, estimate: 120)
         ]
         tasks[0].starred = true
         tasks[1].starred = true
@@ -849,13 +1042,14 @@ enum TaskDemo {
             (0, 8, 0, 50), (0, 10, 8, 25), (0, 11, 2, 25),
             (1, 9, 0, 50), (1, 13, 7, 45), (1, 15, 8, 50),
             (2, 9, 0, 50), (2, 14, 10, 20), (2, 16, 7, 25),
-            (3, 8, 8, 35), (3, 10, 2, 50), (4, 9, 0, 25), (4, 11, 7, 50)
+            (3, 8, 8, 35), (3, 10, 2, 50), (4, 9, 0, 25), (4, 11, 7, 50),
+            (1, 18, 15, 50), (3, 18, 15, 40)
         ]
         for item in pattern {
             let task = tasks[item.index]
             let day = calendar.date(byAdding: .day, value: -item.daysAgo, to: calendar.startOfDay(for: Date()))!
             sessions.append(FocusSession(start: day.addingTimeInterval(Double(item.hour) * 3600), minutes: item.minutes,
-                                         taskId: task.id, title: task.title, topic: task.topic, device: "demo"))
+                                         taskId: task.id, title: task.title, topic: task.topic, device: "demo", goalId: task.goalId))
         }
         return sessions
     }

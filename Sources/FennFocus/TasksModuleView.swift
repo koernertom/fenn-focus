@@ -1,6 +1,9 @@
 import SwiftUI
+import AppKit
 
-/// Work first: tasks by topic with priority, time frame and estimate – as a list, a timeline, and what the time went into.
+/// Work first: tasks by topic with priority, time frame and estimate – as a list, goals, a week plan, a timeline,
+/// and what the time went into. Keys (when no text field is being edited): N new task, F focus, W week, G goals,
+/// ↑/↓ select, Space tick off, ⌘K the command palette.
 struct TasksModuleView: View {
     @ObservedObject var store: TaskStore
     @ObservedObject var focus: FocusTimer
@@ -8,11 +11,13 @@ struct TasksModuleView: View {
     let openModule: (IslandModule) -> Void
 
     enum Mode: String, CaseIterable, Identifiable {
-        case list, day, timeline, stats
+        case list, goals, week, day, timeline, stats
         var id: String { rawValue }
         var title: String {
             switch self {
-            case .list: return tr("Liste", "List")
+            case .list: return tr("Heute", "Today")
+            case .goals: return tr("Ziele", "Goals")
+            case .week: return tr("Woche", "Week")
             case .day: return tr("Tag nach Stunden", "Day by the hour")
             case .timeline: return "Timeline"
             case .stats: return tr("Auswertung", "Review")
@@ -21,14 +26,26 @@ struct TasksModuleView: View {
         var symbol: String {
             switch self {
             case .list: return "checklist"
+            case .goals: return "flag.checkered"
+            case .week: return "calendar"
             case .day: return "clock"
             case .timeline: return "calendar.day.timeline.left"
             case .stats: return "chart.bar.xaxis"
             }
         }
+        /// The key that jumps here, shown in the tooltip.
+        var key: String? {
+            switch self {
+            case .list: return "L"
+            case .goals: return "G"
+            case .week: return "W"
+            default: return nil
+            }
+        }
     }
 
-    @AppStorage("fenn.tasks.mode") private var mode = Mode.list
+    static let modeKey = "fenn.tasks.mode"
+    @AppStorage(TasksModuleView.modeKey) private var mode = Mode.list
     @State private var draft = ""
     @State private var editing: UUID?
     /// Keeps rows from resorting/regrouping while the inline editor is open (avoids focus loss and jumping).
@@ -39,36 +56,54 @@ struct TasksModuleView: View {
     @FocusState private var fieldFocused: Bool
     @ObservedObject private var calendarSync = TaskCalendarSync.shared
     @State private var day = Calendar.current.startOfDay(for: Date())
+    @ObservedObject private var nav = TasksNav.shared
+    @StateObject private var keys = TaskKeyMonitor()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .center) {
-                Text(tr("Aufgaben", "Tasks")).font(Fenn.display(22)).foregroundStyle(Fenn.fg)
-                Spacer()
-                Button {
-                    if calendarSync.isOn { calendarSync.disable() } else { Task { await calendarSync.enable() } }
-                } label: {
-                    Image(systemName: calendarSync.isOn ? "calendar.badge.checkmark" : "calendar.badge.plus")
-                }
-                .buttonStyle(FennIconButtonStyle(isActive: calendarSync.isOn))
-                .help(calendarSync.isOn
-                      ? tr("Aufgaben mit Datum stehen im Kalender „Fenn Focus“ – klicken zum Ausschalten", "Dated tasks are in the calendar “Fenn Focus” – click to turn off")
-                      : tr("Aufgaben mit Datum im Apple Kalender anzeigen", "Show dated tasks in Apple Calendar"))
-                .accessibilityLabel(tr("Im Kalender anzeigen", "Show in Calendar"))
-                HStack(spacing: 2) {
-                    ForEach(Mode.allCases) { item in
-                        Button { withAnimation(.snappy) { mode = item } } label: { Image(systemName: item.symbol) }
-                            .buttonStyle(FennIconButtonStyle(isActive: mode == item))
-                            .help(item.title)
-                            .accessibilityLabel(item.title)
-                    }
-                }
-                .padding(3)
-                .background(Capsule().fill(Fenn.fill))
+        ZStack(alignment: .top) {
+            if nav.focusOpen {
+                TaskFocusView(store: store, focus: focus, nav: nav)
+                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
+            } else {
+                content
+                    .transition(.opacity)
             }
+            if nav.paletteOpen {
+                Color.black.opacity(0.18)
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .onTapGesture { nav.closePalette() }
+                    .transition(.opacity)
+                CommandPalette(items: paletteItems, nav: nav)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 48)
+                    .transition(.opacity.combined(with: .offset(y: -8)))
+            }
+        }
+        .background(WindowReader { window in
+            keys.window = window
+            keys.releaseEmptyField()
+        })
+        .onAppear {
+            keys.handle = { event, editing in handleKey(event, editing: editing) }
+            keys.install()
+            #if DEBUG
+            qaOpen()
+            #endif
+        }
+        .onDisappear {
+            keys.remove()
+            nav.paletteOpen = false
+        }
+        .onChange(of: nav.focusAddRequest) { _, _ in
+            DispatchQueue.main.async { fieldFocused = true }
+        }
+    }
 
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            header
             if mode != .stats { addField }
-            if calendarSync.isOn && !calendarSync.hasAccess {
+            if calendarSync.isOn && !calendarSync.hasAccess && !FennDemo.isOn {
                 Button { Task { await calendarSync.enable() } } label: {
                     Label(tr("Kalenderzugriff fehlt – klicken, um ihn wieder zu erlauben", "Calendar access missing – click to allow it again"),
                           systemImage: "calendar.badge.exclamationmark")
@@ -81,25 +116,93 @@ struct TasksModuleView: View {
                 Text(error).font(.fenn(size: 11)).foregroundStyle(Fenn.danger)
             }
 
-            ScrollView {
-                Group {
-                    switch mode {
-                    case .list: list
-                    case .day: dayView
-                    case .timeline: TaskTimeline(tasks: store.open) { task in beginEditing(task.id); mode = .list }
-                    case .stats: WorkStats(store: store, metrics: metrics)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    Group {
+                        switch mode {
+                        case .list: list
+                        case .goals: GoalsView(store: store, nav: nav, edit: openInList, startFocus: startFocus)
+                        case .week: WeekPlanView(store: store, nav: nav, edit: openInList, startFocus: startFocus)
+                        case .day: dayView
+                        case .timeline: TaskTimeline(tasks: store.open) { task in beginEditing(task.id); mode = .list }
+                        case .stats: WorkStats(store: store, metrics: metrics) {
+                            GoalPlanner.closeWeek(store)
+                            nav.weekOffset = 1
+                            withAnimation(.snappy) { mode = .week }
+                        }
+                        }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 8)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, 8)
+                .scrollIndicators(.never)
+                .onChange(of: nav.selected) { _, id in
+                    if let id { withAnimation(.snappy) { proxy.scrollTo(id, anchor: .center) } }
+                }
             }
-            .scrollIndicators(.never)
-
-            storageLine
         }
         .onAppear {
             store.reload()
         }
+    }
+
+    // MARK: Header
+
+    private static let mainModes: [Mode?] = [.list, .week, .goals]
+
+    /// Title, three views as text segments, everything else in one … menu.
+    private var header: some View {
+        HStack(alignment: .center, spacing: 10) {
+            Text(tr("Aufgaben", "Tasks")).font(Fenn.display(22)).foregroundStyle(Fenn.fg)
+            Spacer(minLength: 6)
+            FennSegments(options: Self.mainModes,
+                         selection: Binding(get: { Self.mainModes.contains(mode) ? mode : nil },
+                                            set: { if let new = $0 { mode = new } }),
+                         title: { $0?.title ?? "" },
+                         help: { item in item.flatMap { mode in mode.key.map { "\(mode.title) (\($0))" } } })
+            moreMenu
+        }
+    }
+
+    private var moreMenu: some View {
+        Menu {
+            Section {
+                ForEach([Mode.day, .timeline, .stats]) { item in
+                    Button { withAnimation(.snappy) { mode = item } } label: {
+                        Label(item == .stats ? tr("Auswertung und Wochenrückblick", "Review and week check") : item.title, systemImage: item.symbol)
+                    }
+                }
+            }
+            Section {
+                Picker(tr("Gruppieren", "Group"), selection: Binding(get: { grouping }, set: { grouping = $0; topic = nil })) {
+                    Text(tr("Nach Thema", "By topic")).tag("topic")
+                    Text(tr("Nach Datum", "By date")).tag("date")
+                }
+                if !store.topics.isEmpty {
+                    Picker(tr("Thema", "Topic"), selection: $topic) {
+                        Text(tr("Alle (\(store.open.count))", "All (\(store.open.count))")).tag(String?.none)
+                        ForEach(store.topics, id: \.self) { name in
+                            Text("\(name) (\(store.open.filter { $0.topic == name }.count))").tag(String?.some(name))
+                        }
+                    }
+                }
+            }
+            Section {
+                Toggle(tr("Im Kalender „Fenn Focus“ anzeigen", "Show in the “Fenn Focus” calendar"), isOn: Binding(
+                    get: { calendarSync.isOn },
+                    set: { on in if on { Task { await calendarSync.enable() } } else { calendarSync.disable() } }))
+                Text(tr("Gespeichert: \(TaskStore.destination)", "Stored: \(TaskStore.destination)"))
+            }
+            Section {
+                Button(tr("Befehle und Tastenkürzel …  ⌘K", "Commands and shortcuts …  ⌘K")) { nav.openPalette() }
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle").font(.fenn(size: 16)).foregroundStyle(Fenn.fg.opacity(0.7))
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .help(tr("Weitere Ansichten, Gruppierung, Kalender", "More views, grouping, calendar"))
     }
 
     // MARK: Day
@@ -125,21 +228,22 @@ struct TasksModuleView: View {
 
     private var addField: some View {
         HStack(spacing: 10) {
-            Image(systemName: "plus").font(.fenn(size: 13, weight: .semibold)).foregroundStyle(Fenn.accent)
-            TextField(tr("Neue Aufgabe", "New task"), text: $draft)
+            Image(systemName: "plus").font(.fenn(size: 12, weight: .semibold)).foregroundStyle(Fenn.fg.opacity(0.5))
+            TextField(tr("Neue Aufgabe – @Ziel, morgen, 45 min", "New task – @goal, tomorrow, 45 min"), text: $draft)
                 .textFieldStyle(.plain)
-                .font(.fenn(size: 14))
+                .font(.fenn(size: 13))
                 .focused($fieldFocused)
                 .onSubmit(add)
         }
-        .padding(.horizontal, 14)
-        .frame(height: 42)
+        .help(tr("Neue Aufgabe (N). @Ziel hängt sie an ein Ziel, #Thema, morgen, bis Freitag, 45 min, wichtig", "New task (N). @goal attaches it to a goal, #topic, tomorrow, by Friday, 45 min, important"))
+        .padding(.horizontal, 12)
+        .frame(height: 34)
         .background(Capsule().fill(Fenn.field))
         .overlay(Capsule().strokeBorder(fieldFocused ? Fenn.accent.opacity(0.5) : Fenn.hairline))
     }
 
     private func add() {
-        var tasks = TaskCapture.rules(draft, topics: store.topics).tasks
+        var tasks = TaskCapture.rules(draft, topics: store.topics, goals: store.goals).tasks
         guard !tasks.isEmpty else { return }
         // Typed into a filtered list: the topic comes with it.
         if let topic { for index in tasks.indices where tasks[index].topic.isEmpty { tasks[index].topic = topic } }
@@ -181,8 +285,16 @@ struct TasksModuleView: View {
     @ViewBuilder
     private var list: some View {
         let open = openTasks
-        VStack(alignment: .leading, spacing: 14) {
-            if store.topics.count > 0 { topicChips }
+        VStack(alignment: .leading, spacing: 16) {
+            if let topic {
+                HStack(spacing: 6) {
+                    Text(tr("Nur „\(topic)“", "Only “\(topic)”")).font(.fenn(size: 12)).foregroundStyle(Fenn.fg.opacity(0.6))
+                    Button(tr("Alle zeigen", "Show all")) { withAnimation(.snappy) { self.topic = nil } }
+                        .buttonStyle(.plain).font(.fenn(size: 12, weight: .medium)).foregroundStyle(Fenn.accent)
+                }
+                .padding(.horizontal, 4)
+            }
+            if topic == nil, !store.open.isEmpty { MainTaskCard(store: store, startFocus: startFocus) }
             if topic == nil { TaskKindCard() }
             if store.tasks.isEmpty {
                 empty
@@ -216,63 +328,20 @@ struct TasksModuleView: View {
         return groups.keys.sorted { (groups[$0]?.first?.rank ?? 99) < (groups[$1]?.first?.rank ?? 99) }
     }
 
-    private var topicChips: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 6) {
-                chip(tr("Alle", "All"), count: store.open.count, selected: topic == nil) { topic = nil }
-                ForEach(store.topics, id: \.self) { name in
-                    chip(name, count: store.open.filter { $0.topic == name }.count, selected: topic == name) { topic = topic == name ? nil : name }
-                }
-                Button { withAnimation(.snappy) { grouping = grouping == "date" ? "topic" : "date"; topic = nil } } label: {
-                    Label(grouping == "date" ? tr("Nach Datum", "By date") : tr("Nach Thema", "By topic"),
-                          systemImage: grouping == "date" ? "calendar" : "number")
-                        .font(.fenn(size: 12, weight: .medium))
-                        .foregroundStyle(Fenn.fg.opacity(0.75))
-                        .padding(.horizontal, 11)
-                        .frame(height: 28)
-                        .overlay(Capsule().strokeBorder(Fenn.hairline))
-                }
-                .buttonStyle(.plain)
-                .help(tr("Gruppierung wechseln: nach Thema oder nach Datum", "Switch grouping: by topic or by date"))
-            }
-        }
-        .scrollIndicators(.never)
-    }
-
-    private func chip(_ title: String, count: Int, selected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 5) {
-                Text(title).lineLimit(1)
-                Text("\(count)").foregroundStyle(selected ? Fenn.canvas.opacity(0.6) : Fenn.fg.opacity(0.45))
-            }
-            .font(.fenn(size: 12, weight: .medium))
-            .foregroundStyle(selected ? Fenn.canvas : Fenn.fg)
-            .padding(.horizontal, 11)
-            .frame(height: 28)
-            .background(Capsule().fill(selected ? Fenn.fg : Fenn.fill))
-        }
-        .buttonStyle(.plain)
-    }
-
     private func group(_ name: String?, _ tasks: [FennTask]) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             if let name {
                 let estimate = tasks.compactMap(\.estimateMinutes).reduce(0, +)
-                HStack {
-                    Text(name.uppercased()).font(.fenn(size: 11, weight: .medium)).tracking(1.2).foregroundStyle(Fenn.fg.opacity(0.55))
-                    Spacer()
-                    if estimate > 0 {
-                        Text("~\(TaskFormat.duration(estimate))").font(.fenn(size: 11, weight: .light)).foregroundStyle(Fenn.fg.opacity(0.5))
-                    }
-                }
-                .padding(.horizontal, 4)
+                FennSectionHeader(name, value: estimate > 0 ? "~\(TaskFormat.duration(estimate))" : nil)
             }
             VStack(spacing: 0) {
                 ForEach(Array(tasks.enumerated()), id: \.element.id) { index, task in
                     TaskRow(task: task, isEditing: editing == task.id, isFocused: focus.taskId == task.id && focus.isActive,
+                            isSelected: nav.selected == task.id, showTopic: grouping == "date" || name == tr("Top 3", "Top 3"),
                             toggle: { withAnimation(.snappy) { store.toggle(task.id) } },
-                            edit: { withAnimation(.snappy) { toggleEditing(task.id) } },
+                            edit: { nav.selected = task.id; withAnimation(.snappy) { toggleEditing(task.id) } },
                             startFocus: { startFocus(task) })
+                        .id(task.id)
                     if editing == task.id {
                         TaskEditor(task: task, topics: store.topics, store: store,
                                    close: { withAnimation(.snappy) { endEditing() } },
@@ -294,11 +363,12 @@ struct TasksModuleView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Button { withAnimation(.snappy) { showDone.toggle() } } label: {
                         HStack(spacing: 6) {
-                            Image(systemName: showDone ? "chevron.down" : "chevron.right").font(.fenn(size: 10, weight: .semibold))
-                            Text(tr("ERLEDIGT, \(done.count)", "DONE, \(done.count)")).font(.fenn(size: 11, weight: .medium)).tracking(1.2)
+                            Image(systemName: "chevron.right").font(.fenn(size: 10, weight: .semibold)).rotationEffect(.degrees(showDone ? 90 : 0))
+                            Text(tr("Erledigt, \(done.count)", "Done, \(done.count)")).font(.fenn(size: 13, weight: .semibold))
                         }
                         .foregroundStyle(Fenn.fg.opacity(0.5))
                         .padding(.horizontal, 4)
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                     if showDone {
@@ -327,32 +397,225 @@ struct TasksModuleView: View {
         .padding(.vertical, 40)
     }
 
+    /// ▶ opens the focus view on the task and starts the Pomodoro (or moves a running one over to it).
     private func startFocus(_ task: FennTask) {
-        focus.focus(on: task)
-        if !focus.isRunning { focus.start() }
-        openModule(.focus)
+        endEditing()
+        FocusFlow.enter(task, focus: focus, nav: nav, start: true)
     }
 
-    // MARK: Storage
+    /// From the goals or week view: the task in the list with its editor open.
+    private func openInList(_ task: FennTask) {
+        topic = nil
+        if task.done { showDone = true }
+        withAnimation(.snappy) { mode = .list }
+        nav.selected = task.id
+        beginEditing(task.id)
+    }
 
-    /// Where the tasks are stored – the Fenn Focus folder, or inside the app until one is picked.
-    private var storageLine: some View {
-        HStack(spacing: 8) {
-            ClaySymbol(symbol: "folder", size: 17, tint: Fenn.fg.opacity(0.55))
-            Text(TaskStore.destination).lineLimit(1)
-            Spacer()
+    // MARK: Keys
+
+    /// The list as it is drawn, top to bottom – for ↑/↓.
+    private var displayOrder: [FennTask] {
+        let open = openTasks
+        if topic != nil { return open }
+        if grouping == "date" { return TaskGroups.make(open, by: "date").flatMap(\.tasks) }
+        let top = open.filter(\.isStarred)
+        let rest = open.filter { !$0.isStarred }
+        let groups = Dictionary(grouping: rest) { $0.topicTitle }
+        return top + groupOrder(rest, groups).flatMap { groups[$0] ?? [] }
+    }
+
+    private func handleKey(_ event: NSEvent, editing: Bool) -> Bool {
+        let key = TaskKeyMonitor.key(event)
+        let modifiers = TaskKeyMonitor.modifiers(event)
+        let character = event.charactersIgnoringModifiers?.lowercased() ?? ""
+
+        if nav.paletteOpen {
+            let items = paletteItems
+            switch key {
+            case .escape: nav.closePalette()
+            case .up: nav.paletteIndex = max(0, nav.paletteIndex - 1)
+            case .down: nav.paletteIndex = min(max(items.count - 1, 0), nav.paletteIndex + 1)
+            case .enter:
+                guard items.indices.contains(nav.paletteIndex) else { return true }
+                let item = items[nav.paletteIndex]
+                nav.closePalette()
+                item.run()
+            default: return false
+            }
+            return true
         }
-        .font(.fenn(size: 11))
-        .foregroundStyle(Fenn.fg.opacity(0.55))
+        if modifiers == .command, character == "k" {
+            endEditing()
+            nav.openPalette()
+            return true
+        }
+        if nav.focusOpen {
+            let task = nav.focusTaskId.flatMap { id in store.open.first { $0.id == id } }
+            if key == .escape { nav.closeFocus(); return true }
+            if modifiers == .command, key == .enter, let task {
+                FocusFlow.complete(task, store: store, focus: focus, nav: nav)
+                return true
+            }
+            if !editing, modifiers.isEmpty, key == .space, let task {
+                FocusFlow.startPause(task, focus: focus)
+                return true
+            }
+            return false
+        }
+        guard !editing, modifiers.isEmpty || (modifiers == .shift && key == .other) else { return false }
+
+        switch key {
+        case .up, .down:
+            guard mode == .list else { return false }
+            let order = displayOrder
+            guard !order.isEmpty else { return true }
+            let index = nav.selected.flatMap { id in order.firstIndex { $0.id == id } }
+            let next = index.map { key == .down ? min(order.count - 1, $0 + 1) : max(0, $0 - 1) } ?? (key == .down ? 0 : order.count - 1)
+            if self.editing != nil { endEditing() }
+            nav.selected = order[next].id
+            return true
+        case .space:
+            guard mode == .list, let id = nav.selected, store.open.contains(where: { $0.id == id }) else { return false }
+            let order = displayOrder
+            let index = order.firstIndex { $0.id == id }
+            withAnimation(.snappy) { store.toggle(id) }
+            // The selection moves on to the row that takes its place.
+            let rest = order.filter { $0.id != id }
+            if let index, !rest.isEmpty { nav.selected = rest[min(index, rest.count - 1)].id } else { nav.selected = nil }
+            return true
+        case .escape, .enter, .other:
+            break
+        }
+        switch character {
+        case "n":
+            if mode == .stats || mode == .day || mode == .timeline { withAnimation(.snappy) { mode = .list } }
+            nav.focusAddRequest += 1
+            return true
+        case "f":
+            let selected = nav.selected.flatMap { id in store.open.first { $0.id == id } }
+            guard let task = selected ?? (mode == .list ? displayOrder.first : nil) ?? store.mainTask(on: FennVault.dayKey(Date())) ?? store.next(1).first else { return false }
+            FocusFlow.enter(task, focus: focus, nav: nav, start: false)
+            return true
+        case "w":
+            withAnimation(.snappy) { mode = .week }
+            return true
+        case "l":
+            withAnimation(.snappy) { mode = .list }
+            return true
+        case "g":
+            withAnimation(.snappy) { mode = .goals }
+            return true
+        default:
+            return false
+        }
     }
+
+    // MARK: Palette
+
+    /// Tasks, goals, the module's views, the other areas and a few actions – filtered by what's typed.
+    private var paletteItems: [PaletteItem] {
+        let query = nav.paletteQuery.trimmingCharacters(in: .whitespaces).lowercased()
+        let action = tr("Aktion", "Action")
+        let commands = tr("Befehle", "Commands")
+        var actions = [
+            PaletteItem(id: "action.task", title: tr("Neue Aufgabe", "New task"), kind: action, symbol: "plus", group: commands) {
+                if mode == .stats || mode == .day || mode == .timeline { mode = .list }
+                nav.focusAddRequest += 1
+            },
+            PaletteItem(id: "action.goal", title: tr("Neues Ziel", "New goal"), kind: action, symbol: "flag", group: commands) {
+                nav.pendingNewGoal = true
+                withAnimation(.snappy) { mode = .goals }
+            },
+            PaletteItem(id: "action.week", title: tr("Woche planen", "Plan the week"), kind: action, symbol: "calendar", group: commands) {
+                withAnimation(.snappy) { mode = .week }
+            },
+        ]
+        let focusTarget = nav.selected.flatMap { id in store.open.first { $0.id == id } }
+            ?? store.mainTask(on: FennVault.dayKey(Date())) ?? store.next(1).first
+        if let focusTarget {
+            actions.append(PaletteItem(id: "action.focus", title: tr("Fokus starten: \(focusTarget.title)", "Start focus: \(focusTarget.title)"),
+                                       kind: action, symbol: "timer", group: commands) {
+                FocusFlow.enter(focusTarget, focus: focus, nav: nav, start: true)
+            })
+        }
+        actions.append(PaletteItem(id: "action.closeWeek", title: tr("Woche abschließen", "Close the week"), kind: action, symbol: "checkmark.seal", group: commands) {
+            withAnimation(.snappy) { mode = .stats }
+        })
+        let views = Mode.allCases.filter { $0 != mode }.map { item in
+            PaletteItem(id: "view.\(item.rawValue)", title: item.title, kind: tr("Ansicht", "View"), symbol: item.symbol, group: commands) {
+                withAnimation(.snappy) { mode = item }
+            }
+        }
+        let goals = store.activeGoals.map { goal in
+            PaletteItem(id: "goal.\(goal.id)", title: goal.title, kind: GoalPlanner.weekLine(store.goalMinutes(goal.id, in: .thisWeek), target: goal.weeklyMinutes),
+                        symbol: goal.symbol ?? "flag.checkered", group: tr("Ziele", "Goals")) {
+                withAnimation(.snappy) { mode = .goals }
+            }
+        }
+        let tasks = store.open.map { task in
+            PaletteItem(id: "task.\(task.id)", title: task.title,
+                        kind: store.goal(task.goalId)?.title ?? (task.topic.isEmpty ? tr("Aufgabe", "Task") : task.topic), symbol: "circle", group: tr("Aufgaben", "Tasks")) {
+                openInList(task)
+            }
+        }
+        let modules = IslandModule.allCases.filter { $0 != .tasks }.map { module in
+            PaletteItem(id: "module.\(module.rawValue)", title: module.title, kind: tr("Bereich", "Area"), symbol: module.symbol, group: tr("Bereiche", "Areas")) {
+                openModule(module)
+            }
+        }
+        if query.isEmpty { return actions + views + goals + Array(tasks.prefix(5)) + modules }
+        let matches: ([PaletteItem]) -> [PaletteItem] = { $0.filter { $0.title.lowercased().contains(query) || $0.kind.lowercased().contains(query) } }
+        return Array((matches(actions + views) + matches(goals) + matches(tasks) + matches(modules)).prefix(40))
+    }
+
+    #if DEBUG
+    /// QA only (demo): -FennQATasksMode focus|alldone|palette|select|edit opens that state; the mode itself comes from -fenn.tasks.mode.
+    private func qaOpen() {
+        guard FennDemo.isOn else { return }
+        // -FennQAStopTimer YES: ends the demo Pomodoro a QA run left behind (and its pending notification).
+        if UserDefaults.standard.bool(forKey: "FennQAStopTimer") { focus.stop() }
+        // -FennQAKeys "down,space,g": the keys arrive through the event queue, like typed ones.
+        if let script = UserDefaults.standard.string(forKey: "FennQAKeys") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { TaskKeyMonitor.qaType(script, into: keys.window) }
+        }
+        guard let state = UserDefaults.standard.string(forKey: "FennQATasksMode") else { return }
+        switch state {
+        case "focus":
+            if let task = store.mainTask(on: FennVault.dayKey(Date())) ?? store.next(1).first {
+                FocusFlow.enter(task, focus: focus, nav: nav, start: UserDefaults.standard.bool(forKey: "FennQAFocusRun"))
+                if UserDefaults.standard.bool(forKey: "FennQAFocusComplete") { FocusFlow.complete(task, store: store, focus: focus, nav: nav) }
+            }
+        case "alldone":
+            nav.focusFinished = []
+            nav.focusTaskId = nil
+            nav.focusOpen = true
+        case "palette":
+            nav.openPalette()
+            nav.paletteQuery = UserDefaults.standard.string(forKey: "FennQAPaletteQuery") ?? ""
+        case "select":
+            nav.selected = displayOrder.dropFirst().first?.id
+        case "edit":
+            if let task = displayOrder.first { nav.selected = task.id; beginEditing(task.id) }
+        default: break
+        }
+    }
+    #endif
 }
 
 // MARK: - Row
 
+/// Title and one quiet line under it: goal (or topic), date, estimate, repeat. ▶ shows on hover.
 struct TaskRow: View {
     let task: FennTask
     let isEditing: Bool
     let isFocused: Bool
+    /// Picked with ↑/↓.
+    var isSelected = false
+    /// The goal in the second line – off inside the goal's own list.
+    var showGoal = true
+    /// The topic in the second line when there is no goal (off when the list is grouped by topic).
+    var showTopic = false
     let toggle: () -> Void
     let edit: () -> Void
     let startFocus: () -> Void
@@ -362,43 +625,60 @@ struct TaskRow: View {
         HStack(spacing: 10) {
             Button(action: toggle) {
                 Image(systemName: task.done ? "checkmark.circle.fill" : "circle")
-                    .font(.fenn(size: 17, weight: .light))
+                    .font(.fenn(size: 18, weight: .light))
                     .foregroundStyle(task.done ? Fenn.accent : task.priority.color)
             }
             .buttonStyle(.plain)
-            .frame(width: 24)
+            .frame(width: 22)
             .help(task.done ? tr("Wieder öffnen", "Reopen") : tr("Erledigt", "Done"))
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(task.title)
-                    .font(.fenn(size: 14))
+                    .font(.fenn(size: 13.5))
                     .foregroundStyle(task.done ? Fenn.fg.opacity(0.45) : Fenn.fg)
                     .strikethrough(task.done, color: Fenn.fg.opacity(0.3))
                     .lineLimit(2)
-                if !task.done { meta }
+                if !task.done, let line = secondary {
+                    line.font(.fenn(size: 11.5)).lineLimit(1)
+                }
             }
             Spacer(minLength: 4)
             if task.isStarred && !task.done {
-                ClaySymbol(symbol: "star.fill", size: 16, tint: Fenn.amber).help(tr("Top 3", "Top 3"))
+                Image(systemName: "star.fill").font(.fenn(size: 10)).foregroundStyle(Fenn.amber).help(tr("Top 3", "Top 3"))
             }
             if isFocused {
-                ClaySymbol(symbol: "timer", size: 20).help(tr("Läuft im Fokus", "In focus"))
+                Image(systemName: "timer").font(.fenn(size: 13, weight: .medium)).foregroundStyle(Fenn.accent).help(tr("Läuft im Fokus", "In focus"))
             } else if !task.done, hovering || isEditing {
                 Button(action: startFocus) { Image(systemName: "play.fill").font(.fenn(size: 11)) }
                     .buttonStyle(FennIconButtonStyle())
-                    .help(tr("Fokus auf diese Aufgabe", "Focus on this task"))
+                    .help(tr("Fokus auf diese Aufgabe (F)", "Focus on this task (F)"))
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 9)
+        .padding(.vertical, 8)
         .contentShape(Rectangle())
-        .background(isEditing ? Fenn.fill : .clear)
+        .background(isEditing ? Fenn.fill : (isSelected ? Fenn.accent.opacity(0.1) : .clear))
         .onTapGesture(perform: edit)
         .onHover { hovering = $0 }
         .contextMenu {
             let store = TaskStore.shared
             if !task.done {
                 Button(task.isStarred ? tr("Aus den Top 3", "Remove from top 3") : tr("In die Top 3", "Into the top 3")) { withAnimation(.snappy) { store.toggleStar(task.id) } }
+                let today = FennVault.dayKey(Date())
+                Button(task.mainDay == today ? tr("Nicht mehr „Heute zuerst“", "No longer “First today”") : tr("Heute zuerst", "First today")) {
+                    withAnimation(.snappy) { store.setMain(task.mainDay == today ? nil : task.id, on: today) }
+                }
+                if !store.activeGoals.isEmpty {
+                    Menu(tr("Ziel", "Goal")) {
+                        ForEach(store.activeGoals) { goal in
+                            Button(goal.title) { var copy = task; copy.goalId = goal.id; store.update(copy) }
+                        }
+                        if task.goalId != nil {
+                            Divider()
+                            Button(tr("Kein Ziel", "No goal")) { var copy = task; copy.goalId = nil; store.update(copy) }
+                        }
+                    }
+                }
                 Button(tr("Heute", "Today")) { move(0) }
                 Button(tr("Morgen", "Tomorrow")) { move(1) }
                 Button(tr("Ist ein Termin – blockt nur Zeit", "It's an appointment – just blocks time")) { store.setBlocker(task.id, true) }
@@ -427,28 +707,29 @@ struct TaskRow: View {
         TaskStore.shared.update(copy)
     }
 
-    private var meta: some View {
-        HStack(spacing: 8) {
-            if task.priority == .high {
-                Label(tr("Hoch", "High"), systemImage: "exclamationmark").labelStyle(.titleAndIcon).foregroundStyle(Fenn.accent)
-            }
-            if let due = task.due {
-                Label(dateText(due), systemImage: "calendar")
-                    .foregroundStyle(task.isOverdue ? Fenn.danger : (task.isDueToday ? Fenn.amber : Fenn.fg.opacity(0.55)))
-            }
-            if let rule = task.repeatRule {
-                Label(rule.title, systemImage: "repeat").foregroundStyle(Fenn.fg.opacity(0.55))
-            }
-            if let estimate = task.estimateMinutes {
-                Label(task.spentMinutes > 0 ? "\(TaskFormat.duration(task.spentMinutes)) / \(TaskFormat.duration(estimate))" : "~\(TaskFormat.duration(estimate))",
-                      systemImage: "hourglass")
-                    .foregroundStyle(task.spentMinutes > estimate ? Fenn.danger.opacity(0.8) : Fenn.fg.opacity(0.55))
-            } else if task.spentMinutes > 0 {
-                Label(TaskFormat.duration(task.spentMinutes), systemImage: "timer").foregroundStyle(Fenn.fg.opacity(0.55))
-            }
+    /// "Nordlicht-Pitch gewinnen · morgen · 2:30 h / 4 h · ↻" – colour only for the date's state and an overrun.
+    private var secondary: Text? {
+        let muted = Fenn.fg.opacity(0.55)
+        var parts: [Text] = []
+        if showGoal, let goal = TaskStore.shared.goal(task.goalId) {
+            parts.append(Text(goal.title))
+        } else if showTopic, !task.topic.isEmpty {
+            parts.append(Text(task.topic))
         }
-        .font(.fenn(size: 11))
-        .labelStyle(CompactLabel())
+        if let due = task.due {
+            let color = task.isOverdue ? Fenn.danger : (task.isDueToday ? Fenn.amber : muted)
+            parts.append(Text(dateText(due)).foregroundColor(color))
+        }
+        if let estimate = task.estimateMinutes {
+            parts.append(task.spentMinutes > 0
+                         ? Text("\(TaskFormat.duration(task.spentMinutes)) / \(TaskFormat.duration(estimate))").foregroundColor(task.spentMinutes > estimate ? Fenn.danger : muted)
+                         : Text("~\(TaskFormat.duration(estimate))"))
+        } else if task.spentMinutes > 0 {
+            parts.append(Text(TaskFormat.duration(task.spentMinutes)))
+        }
+        if task.repeatRule != nil { parts.append(Text(Image(systemName: "repeat"))) }
+        guard let first = parts.first else { return nil }
+        return parts.dropFirst().reduce(first) { $0 + Text(" · ") + $1 }.foregroundColor(muted)
     }
 
     private func dateText(_ due: Date) -> String {
@@ -456,15 +737,6 @@ struct TaskRow: View {
             return "\(TaskFormat.day(start)) – \(TaskFormat.when(due))"
         }
         return TaskFormat.when(due)
-    }
-}
-
-private struct CompactLabel: LabelStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack(spacing: 3) {
-            configuration.icon.font(.fenn(size: 9, weight: .semibold))
-            configuration.title
-        }
     }
 }
 
@@ -478,26 +750,62 @@ struct TaskEditor: View {
     let startFocus: () -> Void
 
     private static let estimates = [15, 30, 45, 60, 90, 120, 180, 240, 360, 480]
+    private static let logChoices = [15, 25, 30, 45, 50, 60, 90, 120, 180]
+    @State private var logMinutes = 25
+    /// When the logged minutes ended.
+    @State private var logEnd = Date()
+    @State private var logged: String?
+
+    /// "Mehr": priority, topic, start and time, repeat, appointment, log time.
+    @State private var more = TaskEditor.qaMore
+
+    /// QA only (demo): -FennQAEditorMore YES opens "Mehr".
+    private static var qaMore: Bool {
+        #if DEBUG
+        return FennDemo.isOn && UserDefaults.standard.bool(forKey: "FennQAEditorMore")
+        #else
+        return false
+        #endif
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             TextField(tr("Titel", "Title"), text: $task.title, axis: .vertical)
                 .textFieldStyle(.plain)
                 .font(.fenn(size: 15, weight: .medium))
                 .onSubmit(commit)
 
-            grid
+            HStack(spacing: 6) {
+                goalMenu
+                dateMenu
+                estimateMenu
+                Spacer(minLength: 0)
+            }
 
-            HStack(spacing: 8) {
-                Button(action: { commit(); startFocus() }) { Label(tr("Fokus", "Focus"), systemImage: "play.fill") }
-                    .buttonStyle(FennPillButtonStyle())
+            Button { withAnimation(.snappy) { more.toggle() } } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "chevron.right").font(.fenn(size: 9, weight: .semibold)).rotationEffect(.degrees(more ? 90 : 0))
+                    Text(more ? tr("Weniger", "Less") : tr("Mehr: Priorität, Uhrzeit, Wiederholen, Zeit nachtragen …", "More: priority, time, repeat, log time …"))
+                        .font(.fenn(size: 12))
+                }
+                .foregroundStyle(Fenn.fg.opacity(0.55))
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if more { grid.transition(.opacity) }
+
+            HStack(spacing: 10) {
+                Button(action: { commit(); startFocus() }) { Label(tr("Fokus", "Focus"), systemImage: "play.fill").font(.fenn(size: 12, weight: .medium)) }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Fenn.fg.opacity(0.75))
+                    .help(tr("Fokusansicht mit Pomodoro", "Focus view with Pomodoro"))
                 Spacer()
-                Button(task.done ? tr("Wieder öffnen", "Reopen") : tr("Abhaken", "Tick off")) { commit(); store.toggle(task.id); close() }
-                    .buttonStyle(FennPillButtonStyle())
                 Button { store.delete(task.id); close() } label: { Image(systemName: "trash") }
                     .buttonStyle(.plain)
-                    .foregroundStyle(Fenn.danger.opacity(0.8))
+                    .foregroundStyle(Fenn.fg.opacity(0.45))
                     .help(tr("Löschen", "Delete"))
+                    .accessibilityLabel(tr("Löschen", "Delete"))
                 Button(tr("Fertig", "Done")) { commit(); close() }
                     .buttonStyle(FennPillButtonStyle(prominent: true))
                     .keyboardShortcut(.defaultAction)
@@ -509,10 +817,80 @@ struct TaskEditor: View {
         .onDisappear(perform: commit)
     }
 
+    /// A small pull-down: symbol, value, chevron.
+    private func pullLabel(_ symbol: String, _ text: String, set: Bool) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: symbol).font(.fenn(size: 10, weight: .medium))
+            Text(text).lineLimit(1)
+            Image(systemName: "chevron.down").font(.fenn(size: 8, weight: .semibold)).opacity(0.5)
+        }
+        .font(.fenn(size: 12, weight: .medium))
+        .foregroundStyle(set ? Fenn.fg.opacity(0.85) : Fenn.fg.opacity(0.55))
+    }
+
+    private var goalMenu: some View {
+        Menu {
+            ForEach(store.activeGoals) { goal in Button(goal.title) { task.goalId = goal.id } }
+            if !store.activeGoals.isEmpty { Divider() }
+            Button(tr("Kein Ziel", "No goal")) { task.goalId = nil }
+        } label: {
+            pullLabel("flag", store.goal(task.goalId)?.title ?? tr("Ziel", "Goal"), set: task.goalId != nil)
+        }
+        .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+        .help(tr("Zu welchem Ziel diese Aufgabe gehört (auch mit @Ziel beim Anlegen)", "Which goal this task belongs to (also @goal when adding)"))
+    }
+
+    private var dateMenu: some View {
+        Menu {
+            Button(tr("Heute", "Today")) { setDay(0) }
+            Button(tr("Morgen", "Tomorrow")) { setDay(1) }
+            Button(tr("Nächste Woche", "Next week")) {
+                let calendar = Calendar.current
+                let monday = calendar.nextDate(after: Date(), matching: DateComponents(weekday: 2), matchingPolicy: .nextTime) ?? Date()
+                setDay(calendar.dateComponents([.day], from: calendar.startOfDay(for: Date()), to: calendar.startOfDay(for: monday)).day ?? 7)
+            }
+            Button(tr("Datum wählen …", "Pick a date …")) {
+                if task.due == nil { task.due = Calendar.current.startOfDay(for: Date()) }
+                withAnimation(.snappy) { more = true }
+            }
+            if task.due != nil {
+                Divider()
+                Button(tr("Kein Datum", "No date")) { task.due = nil }
+            }
+        } label: {
+            pullLabel("calendar", task.due.map(TaskFormat.when) ?? tr("Datum", "Date"), set: task.due != nil)
+        }
+        .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+    }
+
+    private var estimateMenu: some View {
+        Menu {
+            ForEach(Self.estimates, id: \.self) { minutes in Button(TaskFormat.duration(minutes)) { task.estimateMinutes = minutes } }
+            Divider()
+            Button(tr("Keine Schätzung", "No estimate")) { task.estimateMinutes = nil }
+        } label: {
+            pullLabel("hourglass", task.estimateMinutes.map { "~\(TaskFormat.duration($0))" } ?? tr("Dauer", "Estimate"), set: task.estimateMinutes != nil)
+        }
+        .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+    }
+
+    /// A new day keeps the time the task had.
+    private func setDay(_ offset: Int) {
+        let calendar = Calendar.current
+        let day = calendar.date(byAdding: .day, value: offset, to: calendar.startOfDay(for: Date())) ?? Date()
+        if let due = task.due, DayPlanner.hasTime(due) {
+            let parts = calendar.dateComponents([.hour, .minute], from: due)
+            task.due = calendar.date(bySettingHour: parts.hour ?? 0, minute: parts.minute ?? 0, second: 0, of: day)
+        } else {
+            task.due = day
+        }
+        if let start = task.start, let due = task.due, start > due { task.start = nil }
+    }
+
     private var grid: some View {
         Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 10) {
             GridRow {
-                label("tag", tr("Tag / Thema", "Tag / topic"))
+                label("number", tr("Thema", "Topic"))
                 HStack(spacing: 6) {
                     TextField(tr("z. B. Arbeit, Privat", "e.g. Work, private"), text: $task.topic)
                         .textFieldStyle(.plain)
@@ -587,33 +965,57 @@ struct TaskEditor: View {
                     }
                 }
             }
+            if task.spentMinutes > 0 {
+                GridRow {
+                    label("timer", tr("Im Fokus", "In focus"))
+                    Text(TaskFormat.duration(task.spentMinutes)).font(.fenn(size: 13)).foregroundStyle(Fenn.fg.opacity(0.7))
+                }
+            }
             GridRow {
-                label("hourglass", tr("Dauer", "Estimate"))
-                HStack(spacing: 8) {
-                    Menu {
-                        ForEach(Self.estimates, id: \.self) { minutes in Button(TaskFormat.duration(minutes)) { task.estimateMinutes = minutes } }
-                        Divider()
-                        Button(tr("Keine Schätzung", "No estimate")) { task.estimateMinutes = nil }
-                    } label: {
-                        Text(task.estimateMinutes.map { "~\(TaskFormat.duration($0))" } ?? tr("schätzen …", "estimate …"))
-                            .font(.fenn(size: 13))
+                label("clock.arrow.circlepath", tr("Nachtragen", "Log time"))
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 6) {
+                        Menu {
+                            ForEach(Self.logChoices, id: \.self) { minutes in Button(TaskFormat.duration(minutes)) { logMinutes = minutes } }
+                        } label: {
+                            Text(TaskFormat.duration(logMinutes)).font(.fenn(size: 13))
+                        }
+                        .menuStyle(.borderlessButton)
+                        .fixedSize()
+                        Text(tr("bis", "until")).font(.fenn(size: 12)).foregroundStyle(Fenn.fg.opacity(0.5))
+                        DatePicker("", selection: $logEnd, in: ...Date().addingTimeInterval(60), displayedComponents: [.date, .hourAndMinute])
+                            .labelsHidden().datePickerStyle(.field).fixedSize()
                     }
-                    .menuStyle(.borderlessButton)
-                    .fixedSize()
-                    if task.spentMinutes > 0 {
-                        Text(tr("\(TaskFormat.duration(task.spentMinutes)) im Fokus", "\(TaskFormat.duration(task.spentMinutes)) in focus"))
-                            .font(.fenn(size: 12, weight: .light)).foregroundStyle(Fenn.fg.opacity(0.55))
+                    HStack(spacing: 8) {
+                        Button(tr("Eintragen", "Log")) { logTime() }
+                            .buttonStyle(.plain).font(.fenn(size: 12, weight: .medium)).foregroundStyle(Fenn.accent)
+                            .help(tr("Zeit, die ohne Timer an der Aufgabe gearbeitet wurde – zählt für Fokus und Ziel", "Time worked on the task without the timer – counts for focus and the goal"))
+                        Text(logged ?? tr("ohne Timer gearbeitet? Zählt für Fokus und Ziel", "worked without the timer? Counts for focus and goal"))
+                            .font(.fenn(size: 11)).foregroundStyle(logged == nil ? Fenn.fg.opacity(0.45) : Fenn.accent).lineLimit(1)
                     }
                 }
             }
         }
     }
 
+    /// Minutes worked without the timer: a focus session ending at `logEnd`, so the hours count for the day and the goal.
+    private func logTime() {
+        commit()
+        let end = min(logEnd, Date())
+        store.logFocus(minutes: logMinutes, taskId: task.id, title: task.title, start: end.addingTimeInterval(Double(-logMinutes * 60)))
+        // The store added the minutes – the editor's copy follows, or closing would write the old number back.
+        if let saved = store.tasks.first(where: { $0.id == task.id }) { task.spentMinutes = saved.spentMinutes }
+        logged = tr("+\(TaskFormat.duration(logMinutes)) eingetragen", "+\(TaskFormat.duration(logMinutes)) logged")
+        logEnd = Date()
+    }
+
     private func label(_ symbol: String, _ title: String) -> some View {
         Label(title, systemImage: symbol)
             .font(.fenn(size: 12))
             .foregroundStyle(Fenn.fg.opacity(0.55))
-            .frame(width: 92, alignment: .leading)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .frame(width: 100, alignment: .leading)
     }
 
     /// An optional date: a small "+ Start" button until set, then a compact picker with a clear button.
@@ -829,7 +1231,7 @@ struct TaskTimeline: View {
 }
 
 /// Chips that wrap onto the next line.
-private struct WrapLayout: Layout {
+struct WrapLayout: Layout {
     var spacing: CGFloat = 6
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
@@ -862,7 +1264,10 @@ private struct WrapLayout: Layout {
 struct WorkStats: View {
     @ObservedObject var store: TaskStore
     @ObservedObject var metrics: MetricsStore
+    /// "Woche abschließen": the week check goes into today's journal, then next week opens.
+    var closeWeek: () -> Void = {}
     @State private var period = Period.week
+    @State private var weekClosed = false
 
     enum Period: String, CaseIterable, Identifiable {
         case today, week, month
@@ -897,10 +1302,70 @@ struct WorkStats: View {
                 AuraPill(title: tr("Routinen", "Routines"), value: "\(routines)", palette: .ember, symbol: "repeat")
             }
 
+            thisWeek
             topics(range)
             if period != .today { daily(range) }
             accuracy(range)
         }
+    }
+
+    /// Per goal: hours against the weekly target, steps done, what slipped – and the button that closes the week.
+    private var thisWeek: some View {
+        let goals = GoalPlanner.week(store)
+        let today = Calendar.current.startOfDay(for: Date())
+        let looseSlipped = store.open.filter { $0.goalId == nil && ($0.due.map { DateInterval.thisWeek.contains($0) && $0 < today } ?? false) }
+        return card(tr("Diese Woche", "This week")) {
+            if goals.isEmpty {
+                Text(tr("Noch keine Ziele. In „Ziele“ (G) legst du eins an – dann siehst du hier, wie viele Stunden hineingeflossen sind.",
+                        "No goals yet. Add one under “Goals” (G) – then you see here how many hours went in."))
+                    .font(.fenn(size: 12)).foregroundStyle(Fenn.fg.opacity(0.55))
+            }
+            ForEach(goals) { item in
+                HStack(spacing: 10) {
+                    GoalRing(minutes: item.minutes, target: item.goal.weeklyMinutes, size: 32)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(item.goal.title).font(.fenn(size: 13, weight: .medium)).foregroundStyle(Fenn.fg).lineLimit(1)
+                        Text(weekLine(item)).font(.fenn(size: 11.5))
+                            .foregroundStyle(item.slipped.isEmpty ? Fenn.fg.opacity(0.55) : Fenn.amber)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+            if !looseSlipped.isEmpty {
+                Text(tr("Ohne Ziel verrutscht: ", "Slipped without a goal: ") + looseSlipped.prefix(4).map(\.title).joined(separator: ", "))
+                    .font(.fenn(size: 11)).foregroundStyle(Fenn.fg.opacity(0.55))
+            }
+            HStack(spacing: 10) {
+                Button {
+                    closeWeek()
+                    weekClosed = true
+                } label: {
+                    Label(tr("Woche abschließen", "Close the week"), systemImage: "checkmark.seal").font(.fenn(size: 12, weight: .medium))
+                }
+                .buttonStyle(FennPillButtonStyle(prominent: weekIsEnding))
+                .help(tr("Schreibt einen kurzen Wochen-Check ins heutige Journal und öffnet die nächste Woche zum Planen",
+                         "Writes a short week check into today's journal and opens next week for planning"))
+                Text(weekClosed ? tr("Im Journal von heute.", "In today's journal.") : tr("Kurzer Check ins Journal, dann nächste Woche planen.", "A short check into the journal, then plan next week."))
+                    .font(.fenn(size: 11)).foregroundStyle(Fenn.fg.opacity(0.5))
+            }
+            .padding(.top, 2)
+        }
+    }
+
+    /// Friday afternoon to Sunday: closing the week is the thing to do.
+    private var weekIsEnding: Bool {
+        let now = Date()
+        let weekday = Calendar.current.component(.weekday, from: now)
+        return weekday == 1 || weekday == 7 || (weekday == 6 && Calendar.current.component(.hour, from: now) >= 12)
+    }
+
+    /// "3,7 von 8 h · 1 Schritt erledigt · verrutscht: …"
+    private func weekLine(_ item: GoalPlanner.GoalWeek) -> String {
+        let hours = item.goal.weeklyMinutes.map { tr("\(GoalPlanner.hours(item.minutes)) von \(GoalPlanner.hours($0)) h", "\(GoalPlanner.hours(item.minutes)) of \(GoalPlanner.hours($0)) h") }
+            ?? "\(GoalPlanner.hours(item.minutes)) h"
+        var parts = [hours, GoalPlanner.stepsDone(item.done.count)]
+        if !item.slipped.isEmpty { parts.append(tr("verrutscht: ", "slipped: ") + item.slipped.prefix(3).map(\.title).joined(separator: ", ")) }
+        return parts.joined(separator: " · ")
     }
 
     private func hours(_ minutes: Int) -> String {
@@ -924,7 +1389,7 @@ struct WorkStats: View {
 
     private func card<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(title.uppercased()).font(.fenn(size: 11, weight: .medium)).tracking(1.2).foregroundStyle(Fenn.fg.opacity(0.55))
+            Text(title).font(.fenn(size: 13, weight: .semibold)).foregroundStyle(Fenn.fg.opacity(0.6))
             content()
         }
         .padding(14)
@@ -1032,6 +1497,8 @@ struct FennSegments<Value: Hashable>: View {
     let options: [Value]
     @Binding var selection: Value
     let title: (Value) -> String
+    /// A tooltip per segment (macOS: say the shortcut there).
+    var help: ((Value) -> String?)? = nil
 
     var body: some View {
         HStack(spacing: 2) {
@@ -1047,6 +1514,7 @@ struct FennSegments<Value: Hashable>: View {
                         .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
+                .help(help?(option) ?? "")
             }
         }
         .padding(3)

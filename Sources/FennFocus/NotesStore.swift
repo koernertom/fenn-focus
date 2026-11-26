@@ -91,7 +91,7 @@ final class NotesStore: ObservableObject {
     /// To-dos from the note into the task list.
     func addToTasks(_ todos: [NoteTodo]) {
         guard !todos.isEmpty else { return }
-        TaskStore.shared.add(todos.map { TaskCapture.task(from: $0, topics: TaskStore.shared.topics) })
+        TaskStore.shared.add(todos.map { TaskCapture.task(from: $0, topics: TaskStore.shared.topics, goals: TaskStore.shared.goals) })
         current?.addedTodoIDs.formUnion(todos.map(\.id))
         message = nil
     }

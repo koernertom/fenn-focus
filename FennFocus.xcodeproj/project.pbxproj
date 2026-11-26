@@ -80,6 +80,9 @@
 		9C395A6A8788A98321760E3E /* PersonProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60A61A4CA8C47F93BEB1011 /* PersonProfile.swift */; };
 		A18087519D75ECCFA5BC782E /* ProgressModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5C92162B7CE79AFBEBFE4F /* ProgressModuleView.swift */; };
 		EDA00CC27DF54A08B3528AFB /* SyncFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040EFF9ADB1236D8E4A9F942 /* SyncFolder.swift */; };
+		E284F4F4CB4360D1D9ED47ED /* TaskFocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 981EB36A7F57FD0746EEF923 /* TaskFocusView.swift */; };
+		C5AA3D5B11E9BA1AE007A5A1 /* TaskGoals.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8ED2C4063460493B6C22CE /* TaskGoals.swift */; };
+		69BC08536BE4813EC4F589F3 /* TaskWeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C97027F4A424A81DE3C17BC /* TaskWeekView.swift */; };
 		599D5F8EF0AA59351D853BD3 /* TasksModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B4F341A54005641FCC8723 /* TasksModuleView.swift */; };
 		496E587C90CD4338D68DD907 /* TodayModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D3FEA597DA7F0E971CE0E3 /* TodayModuleView.swift */; };
 		3D8BFBCC7CBE0BD5BA17997F /* Transcriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F017ACFDB98CE4F0655FE415 /* Transcriber.swift */; };
@@ -226,6 +229,9 @@
 		C60A61A4CA8C47F93BEB1011 /* PersonProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersonProfile.swift"; sourceTree = "<group>"; };
 		8E5C92162B7CE79AFBEBFE4F /* ProgressModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProgressModuleView.swift"; sourceTree = "<group>"; };
 		040EFF9ADB1236D8E4A9F942 /* SyncFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncFolder.swift"; sourceTree = "<group>"; };
+		981EB36A7F57FD0746EEF923 /* TaskFocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskFocusView.swift"; sourceTree = "<group>"; };
+		EE8ED2C4063460493B6C22CE /* TaskGoals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskGoals.swift"; sourceTree = "<group>"; };
+		7C97027F4A424A81DE3C17BC /* TaskWeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskWeekView.swift"; sourceTree = "<group>"; };
 		00B4F341A54005641FCC8723 /* TasksModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TasksModuleView.swift"; sourceTree = "<group>"; };
 		80D3FEA597DA7F0E971CE0E3 /* TodayModuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodayModuleView.swift"; sourceTree = "<group>"; };
 		F017ACFDB98CE4F0655FE415 /* Transcriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transcriber.swift"; sourceTree = "<group>"; };
@@ -389,6 +395,9 @@
 				C60A61A4CA8C47F93BEB1011 /* PersonProfile.swift */,
 				8E5C92162B7CE79AFBEBFE4F /* ProgressModuleView.swift */,
 				040EFF9ADB1236D8E4A9F942 /* SyncFolder.swift */,
+				981EB36A7F57FD0746EEF923 /* TaskFocusView.swift */,
+				EE8ED2C4063460493B6C22CE /* TaskGoals.swift */,
+				7C97027F4A424A81DE3C17BC /* TaskWeekView.swift */,
 				00B4F341A54005641FCC8723 /* TasksModuleView.swift */,
 				80D3FEA597DA7F0E971CE0E3 /* TodayModuleView.swift */,
 				F017ACFDB98CE4F0655FE415 /* Transcriber.swift */,
@@ -667,6 +676,9 @@
 				9C395A6A8788A98321760E3E /* PersonProfile.swift in Sources */,
 				A18087519D75ECCFA5BC782E /* ProgressModuleView.swift in Sources */,
 				EDA00CC27DF54A08B3528AFB /* SyncFolder.swift in Sources */,
+				E284F4F4CB4360D1D9ED47ED /* TaskFocusView.swift in Sources */,
+				C5AA3D5B11E9BA1AE007A5A1 /* TaskGoals.swift in Sources */,
+				69BC08536BE4813EC4F589F3 /* TaskWeekView.swift in Sources */,
 				599D5F8EF0AA59351D853BD3 /* TasksModuleView.swift in Sources */,
 				496E587C90CD4338D68DD907 /* TodayModuleView.swift in Sources */,
 				3D8BFBCC7CBE0BD5BA17997F /* Transcriber.swift in Sources */,
@@ -754,7 +766,7 @@
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -768,7 +780,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX).core";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -784,7 +796,7 @@
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -798,7 +810,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX).core";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -816,7 +828,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Support/FennFocus.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Support/Host-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -824,7 +836,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -839,7 +851,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Support/FennFocus.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Support/Host-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -847,7 +859,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -859,7 +871,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Support/FennFocusWidgets.entitlements;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Support/WidgetExtension-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -868,7 +880,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX).widgets";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -881,7 +893,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Support/FennFocusWidgets.entitlements;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Support/WidgetExtension-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -890,7 +902,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(FENN_BUNDLE_PREFIX).widgets";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
