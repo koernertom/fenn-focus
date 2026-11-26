@@ -515,7 +515,7 @@ final class TaskStore: ObservableObject {
 
 
     /// Open to-dos – appointments marked as blockers aren't among them.
-    var open: [FennTask] { tasks.filter { !$0.done && !$0.isBlocker }.sorted { $0.rank < $1.rank } }
+    var open: [FennTask] { tasks.filter { !$0.done && !$0.isBlocker }.sorted(by: TaskOrder.before) }
 
     /// Appointments kept as tasks (blockers), from today on – the past ones simply drop away.
     var blockers: [FennTask] {
@@ -673,7 +673,7 @@ enum TaskGroups {
     static func make(_ tasks: [FennTask], by grouping: String, now: Date = Date()) -> [Group] {
         if grouping == "date" { return byDate(tasks, now: now) }
         let groups = Dictionary(grouping: tasks) { $0.topicTitle }
-        return groups.keys.sorted { (groups[$0]?.first?.rank ?? 99) < (groups[$1]?.first?.rank ?? 99) }.map { Group(title: $0, tasks: groups[$0] ?? []) }
+        return TaskOrder.groups(groups).map { Group(title: $0, tasks: groups[$0] ?? []) }
     }
 
     private static func byDate(_ tasks: [FennTask], now: Date) -> [Group] {
@@ -1052,5 +1052,27 @@ enum TaskDemo {
                                          taskId: task.id, title: task.title, topic: task.topic, device: "demo", goalId: task.goalId))
         }
         return sessions
+    }
+}
+
+/// A fixed order even when tasks or groups are equally urgent – the list redraws every second while a timer runs,
+/// and an order that depends on hashing would make groups swap places.
+enum TaskOrder {
+    static func before(_ a: FennTask, _ b: FennTask) -> Bool {
+        if a.rank != b.rank { return a.rank < b.rank }
+        if a.due != b.due { return (a.due ?? .distantFuture) < (b.due ?? .distantFuture) }
+        if a.created != b.created { return a.created < b.created }
+        return a.id.uuidString < b.id.uuidString
+    }
+
+    /// Most urgent group first; on a tie named topics before "no topic", then alphabetically.
+    static func groups(_ groups: [String: [FennTask]]) -> [String] {
+        let none = tr("Ohne Thema", "No topic")
+        return groups.keys.sorted { a, b in
+            let rankA = groups[a]?.map(\.rank).min() ?? 99, rankB = groups[b]?.map(\.rank).min() ?? 99
+            if rankA != rankB { return rankA < rankB }
+            if (a == none) != (b == none) { return b == none }
+            return a.localizedStandardCompare(b) == .orderedAscending
+        }
     }
 }

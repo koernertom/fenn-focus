@@ -322,10 +322,10 @@ struct TasksModuleView: View {
                 let name = task.topicTitle
                 if seen.insert(name).inserted { order.append(name) }
             }
-            for name in groups.keys where !seen.contains(name) { order.append(name) }
+            for name in TaskOrder.groups(groups) where !seen.contains(name) { order.append(name) }
             return order
         }
-        return groups.keys.sorted { (groups[$0]?.first?.rank ?? 99) < (groups[$1]?.first?.rank ?? 99) }
+        return TaskOrder.groups(groups)
     }
 
     private func group(_ name: String?, _ tasks: [FennTask]) -> some View {
